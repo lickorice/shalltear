@@ -11,4 +11,5 @@ LOGGING_FORMAT = "(%(asctime)s) [%(levelname)s] - %(message)s"
 ACTIVE_COGS = [
     "cogs.admin",
     "cogs.core",
+    "cogs.economy",
 ]
