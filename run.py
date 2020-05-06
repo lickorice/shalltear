@@ -1,5 +1,5 @@
 import os, json, logging
-from config import SECRETS_FILE, LOGGING_FORMAT
+from config import SECRETS_FILE, LOGGING_FORMAT, COMMAND_PREFIX
 from bot import BotCore
 
 
@@ -43,5 +43,5 @@ if __name__ == "__main__":
 
     DISCORD_TOKEN = get_discord_token()
 
-    client = BotCore()
-    client.run(DISCORD_TOKEN)
+    bot = BotCore(command_prefix=COMMAND_PREFIX)
+    bot.run(DISCORD_TOKEN)
