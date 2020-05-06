@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from messages.economy import *
-from objects.economy_account import EconomyAccount
+from objects.economy.account import EconomyAccount
 
 
 class Economy(commands.Cog):

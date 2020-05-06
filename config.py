@@ -15,6 +15,6 @@ ACTIVE_COGS = [
 ]
 
 ACTIVE_OBJECTS = [
-    "objects.economy_account",
-    "objects.economy_transaction",
+    "objects.economy.account",
+    "objects.economy.transaction",
 ]

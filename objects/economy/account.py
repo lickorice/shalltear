@@ -5,7 +5,7 @@ from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, Meta
 from sqlalchemy.orm import relationship
 
 from objects.base import Base
-from objects.economy_transaction import EconomyTransaction
+from objects.economy.transaction import EconomyTransaction
 
 
 class EconomyAccount(Base):
