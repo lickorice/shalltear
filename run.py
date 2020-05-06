@@ -1,4 +1,4 @@
-import os, json, logging
+import os, json, logging, importlib
 
 from sqlalchemy.ext.declarative import declarative_base
 
@@ -6,9 +6,6 @@ from config import *
 from bot import BotCore
 
 from objects import base
-from objects.economy_account import EconomyAccount
-from objects.economy_transaction import EconomyTransaction
-
 
 def create_secrets_file():
     """Generate/overwrite the secrets file for this bot."""    
@@ -60,6 +57,12 @@ def main():
     # Instantiate our bot object
     bot = BotCore(command_prefix=COMMAND_PREFIX)
 
+    # We need to preload the objects to add them to
+    # possible migrations
+    for OBJECT_NAME in ACTIVE_OBJECTS:
+        k = importlib.import_module(OBJECT_NAME)
+
+    # Create all tables if they do not exist
     base.Base.metadata.create_all(bot.engine)
     
     # Add our cogs in ACTIVE_COGS (see config)

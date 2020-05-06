@@ -13,3 +13,8 @@ ACTIVE_COGS = [
     "cogs.core",
     "cogs.economy",
 ]
+
+ACTIVE_OBJECTS = [
+    "objects.economy_account",
+    "objects.economy_transaction",
+]
