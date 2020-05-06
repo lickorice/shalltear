@@ -31,15 +31,15 @@ class EconomyAccount(Base):
     def create_economy_account(user_id, session, enabled):
         new_account = EconomyAccount(
             user_id = user_id,
-            balance = 1000,
+            balance = 100000,
             enabled = enabled,
         )
         new_account.transactions = [
-            EconomyTransaction(name="Initial Balance", credit=1000)
+            EconomyTransaction(name="Initial Balance", credit=100000)
         ]
         session.add(new_account)
         session.commit()
         return new_account
 
     def get_balance(self):
-        return self.balance / 100
+        return self.balance / 10000 # Convert to database-friendly format
