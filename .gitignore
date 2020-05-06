@@ -3,3 +3,6 @@ env
 
 # Discord token
 secrets.json
+
+# Python stuff
+__pycache__
