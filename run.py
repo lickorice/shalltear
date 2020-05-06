@@ -1,5 +1,6 @@
 import os, json, logging
-from config import SECRETS_FILE, LOGGING_FORMAT, COMMAND_PREFIX, ACTIVE_COGS
+
+from config import *
 from bot import BotCore
 
 
@@ -50,11 +51,14 @@ if __name__ == "__main__":
 
     DISCORD_TOKEN = get_discord_token()
 
+    # Instantiate our bot object
     bot = BotCore(command_prefix=COMMAND_PREFIX)
-
-    logging.info("Registering cogs...")
+    
+    # Add our cogs in ACTIVE_COGS (see config)
+    logging.info("Loading cogs...")
     for cog in ACTIVE_COGS:
         logging.info(" -- Loading '{}'".format(cog))
         bot.load_extension(cog)
-        
+
+    # Run our bot with token
     bot.run(DISCORD_TOKEN)
