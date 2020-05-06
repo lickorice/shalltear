@@ -1,9 +1,19 @@
 import logging
 from discord.ext import commands
+
+from sqlalchemy import create_engine
+from sqlalchemy.orm import sessionmaker
+
 from config import COMMAND_PREFIX
 
 
 class BotCore(commands.Bot):
+
+    # TODO: Remove hardcoding on engine URI
+    engine = create_engine("sqlite:///data.db", echo=False)
+    SQLSession = sessionmaker(bind=engine, expire_on_commit=False)
+    db_session = SQLSession()
+
     async def on_ready(self):
         logging.info("Logged on as [{}]".format(self.user))
 

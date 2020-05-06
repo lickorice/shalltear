@@ -1,7 +1,13 @@
 import os, json, logging
 
+from sqlalchemy.ext.declarative import declarative_base
+
 from config import *
 from bot import BotCore
+
+from objects import base
+from objects.economy_account import EconomyAccount
+from objects.economy_transaction import EconomyTransaction
 
 
 def create_secrets_file():
@@ -44,7 +50,7 @@ def get_discord_token():
         return get_discord_token()
 
 
-if __name__ == "__main__":
+def main():
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
     logging.info("Starting the bot...")
@@ -53,6 +59,8 @@ if __name__ == "__main__":
 
     # Instantiate our bot object
     bot = BotCore(command_prefix=COMMAND_PREFIX)
+
+    base.Base.metadata.create_all(bot.engine)
     
     # Add our cogs in ACTIVE_COGS (see config)
     logging.info("Loading cogs...")
@@ -62,3 +70,8 @@ if __name__ == "__main__":
 
     # Run our bot with token
     bot.run(DISCORD_TOKEN)
+
+
+if __name__ == "__main__":
+    main()
+
