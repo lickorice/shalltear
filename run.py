@@ -4,6 +4,7 @@ from bot import BotCore
 
 
 def create_secrets_file():
+    """Generate/overwrite the secrets file for this bot."""    
     print("=========================================")
     print("Creating new secrets file {}...".format(SECRETS_FILE))
     print("Please enter your Discord bot's token:")
@@ -16,6 +17,13 @@ def create_secrets_file():
 
 
 def get_discord_token():
+    """Get the Discord bot token from the secrets file.
+    If the secrets file is invalid or does not exist, it calls
+    `create_secrets_file()` to create/overwrite it.
+
+    Returns:
+        {string} -- The bot token.
+    """    
     if os.path.exists(SECRETS_FILE):
         f = open(SECRETS_FILE, 'r')
         try:
@@ -36,7 +44,6 @@ def get_discord_token():
 
 
 if __name__ == "__main__":
-
     logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
 
     logging.info("Starting the bot...")
