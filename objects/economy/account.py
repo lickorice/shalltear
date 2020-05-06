@@ -24,11 +24,16 @@ class EconomyAccount(Base):
         return "<User id={0.id}, enabled={0.enabled}, balance={0.balance}>".format(self)
 
     @staticmethod
-    def get_economy_account(user_id, session):
-        return session.query(EconomyAccount).filter_by(user_id=user_id).first()
+    def get_economy_account(user, session):
+        user_id = user.id
+        result = session.query(EconomyAccount).filter_by(user_id=user_id).first()
+        if result is None:
+            return EconomyAccount.create_economy_account(user, session, not user.bot)
+        return result
 
     @staticmethod
-    def create_economy_account(user_id, session, enabled):
+    def create_economy_account(user, session, enabled):
+        user_id = user.id
         new_account = EconomyAccount(
             user_id = user_id,
             balance = 100000,

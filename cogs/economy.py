@@ -16,13 +16,8 @@ class Economy(commands.Cog):
         """Returns current account's balance."""
         if target is None:
             target = ctx.author
-        target_id = target.id
         # Get current economy account
-        account = EconomyAccount.get_economy_account(target_id, self.bot.db_session)
-        if account is None:
-            account = EconomyAccount.create_economy_account(
-                target_id, self.bot.db_session, not target.bot
-            )
+        account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         await ctx.send(CMD_GIL.format(target.mention, account.get_balance()))
 
     @commands.command()
@@ -33,7 +28,7 @@ class Economy(commands.Cog):
             return
         if target is None:
             target = ctx.author
-        target_account = EconomyAccount.get_economy_account(target.id, self.bot.db_session)
+        target_account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         target_account.add_credit(self.bot.db_session, amount, "Admin grant.")
         await ctx.send(CMD_ADMIN_GIVE.format(target.mention, amount))
 
@@ -45,7 +40,7 @@ class Economy(commands.Cog):
             return
         if target is None:
             target = ctx.author
-        target_account = EconomyAccount.get_economy_account(target.id, self.bot.db_session)
+        target_account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         target_account.add_debit(self.bot.db_session, amount, "Admin grant.")
         await ctx.send(CMD_ADMIN_TAKE.format(target.mention, amount))
 
