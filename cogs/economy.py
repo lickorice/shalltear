@@ -3,7 +3,7 @@ import logging
 import discord
 from discord.ext import commands
 
-from messages.core import *
+from messages.economy import *
 from objects.economy_account import EconomyAccount
 
 
@@ -21,7 +21,7 @@ class Economy(commands.Cog):
             account = EconomyAccount.create_economy_account(
                 target_id, self.bot.db_session, not ctx.author.bot
             )
-        print(account)
+        await ctx.send(CMD_GIL.format(ctx.author.mention, account.get_balance()))
 
 
 def setup(bot):

@@ -40,3 +40,6 @@ class EconomyAccount(Base):
         session.add(new_account)
         session.commit()
         return new_account
+
+    def get_balance(self):
+        return self.balance / 100

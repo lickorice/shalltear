@@ -1,0 +1,1 @@
+CMD_GIL = "{0}, you have currently have **💵 {1:.2f} gil**."
