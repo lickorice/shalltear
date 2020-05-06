@@ -1,6 +1,3 @@
-# Set this to True if you want the console to print debug logs.
-DEBUG_MODE = True
-
 # Logging format
 LOGGING_FORMAT = "(%(asctime)s) [%(levelname)s] - %(message)s"
 

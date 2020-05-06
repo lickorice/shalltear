@@ -1,15 +1,18 @@
-import os, json
-from config import SECRETS_FILE
-from client import BotClient
+import os, json, logging
+from config import SECRETS_FILE, LOGGING_FORMAT
+from bot import BotCore
 
 
 def create_secrets_file():
+    print("=========================================")
     print("Creating new secrets file {}...".format(SECRETS_FILE))
     print("Please enter your Discord bot's token:")
     token = input()
     secrets_json = {'token': token}
     with open(SECRETS_FILE, 'w') as f:
         f.write(json.dumps(secrets_json))
+    print("Secrets file {} successfully created.".format(SECRETS_FILE))
+    print("=========================================")
 
 
 def get_discord_token():
@@ -18,8 +21,8 @@ def get_discord_token():
         try:
             data = json.load(f)
         except Exception as e:
-            print("[ERROR]",type(e).__name__)
-            print("[ERROR] Secrets file {} is invalid.".format(SECRETS_FILE))
+            logging.error(type(e).__name__)
+            logging.error("Secrets file {} is invalid.".format(SECRETS_FILE))
             f.close()
             create_secrets_file()
             f = open(SECRETS_FILE, 'r')
@@ -27,15 +30,18 @@ def get_discord_token():
         f.close()
         return data['token']
     else:
-        print("[ERROR] File {} does not exist.".format(SECRETS_FILE))
+        logging.error("[ERROR] File {} does not exist.".format(SECRETS_FILE))
         create_secrets_file()
         return get_discord_token()
 
 
 if __name__ == "__main__":
-    print("[INFO] Starting the bot...")
+
+    logging.basicConfig(level=logging.INFO, format=LOGGING_FORMAT)
+
+    logging.info("Starting the bot...")
 
     DISCORD_TOKEN = get_discord_token()
 
-    client = BotClient()
+    client = BotCore()
     client.run(DISCORD_TOKEN)
