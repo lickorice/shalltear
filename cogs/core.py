@@ -1,5 +1,9 @@
+import logging
+
 import discord
 from discord.ext import commands
+
+from messages.core import *
 
 
 class Core(commands.Cog):
@@ -7,10 +11,10 @@ class Core(commands.Cog):
         self.bot = bot
 
     @commands.command()
-    async def ping(self, ctx, *, member: discord.Member = None):
+    async def ping(self, ctx):
         """Tests responsiveness."""
-        member = member or ctx.author
-        await ctx.send("Pong!")
+        latency_in_ms = "{} ms".format(int(self.bot.latency * 1000))
+        await ctx.send(CMD_PING.format(latency_in_ms))
 
 
 def setup(bot):
