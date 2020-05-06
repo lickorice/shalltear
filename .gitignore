@@ -1,0 +1,5 @@
+# Python virtual env
+env
+
+# Discord token
+secrets.json
