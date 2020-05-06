@@ -6,3 +6,6 @@ secrets.json
 
 # Python stuff
 __pycache__
+
+# SQLite Database
+data.db
