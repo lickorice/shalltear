@@ -12,6 +12,7 @@ class Admin(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=['rlc',])
+    @commands.is_owner()
     async def reloadcogs(self, ctx, *cogs):
         """Reload specified cogs. If no cog is specified, reloads all cogs."""
         if not len(cogs):
