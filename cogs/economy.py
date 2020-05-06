@@ -12,16 +12,42 @@ class Economy(commands.Cog):
         self.bot = bot
 
     @commands.command(aliases=["$",])
-    async def gil(self, ctx):
+    async def gil(self, ctx, target: discord.Member=None):
         """Returns current account's balance."""
-        target_id = ctx.author.id
+        if target is None:
+            target = ctx.author
+        target_id = target.id
         # Get current economy account
         account = EconomyAccount.get_economy_account(target_id, self.bot.db_session)
         if account is None:
             account = EconomyAccount.create_economy_account(
-                target_id, self.bot.db_session, not ctx.author.bot
+                target_id, self.bot.db_session, not target.bot
             )
-        await ctx.send(CMD_GIL.format(ctx.author.mention, account.get_balance()))
+        await ctx.send(CMD_GIL.format(target.mention, account.get_balance()))
+
+    @commands.command()
+    @commands.is_owner()
+    async def admingive(self, ctx, amount: float, target: discord.Member=None):
+        if amount < 0:
+            await ctx.send(CMD_GIVE_INVALID_AMOUNT)
+            return
+        if target is None:
+            target = ctx.author
+        target_account = EconomyAccount.get_economy_account(target.id, self.bot.db_session)
+        target_account.add_credit(self.bot.db_session, amount, "Admin grant.")
+        await ctx.send(CMD_ADMIN_GIVE.format(target.mention, amount))
+
+    @commands.command()
+    @commands.is_owner()
+    async def admintake(self, ctx, amount: float, target: discord.Member=None):
+        if amount < 0:
+            await ctx.send(CMD_GIVE_INVALID_AMOUNT)
+            return
+        if target is None:
+            target = ctx.author
+        target_account = EconomyAccount.get_economy_account(target.id, self.bot.db_session)
+        target_account.add_debit(self.bot.db_session, amount, "Admin grant.")
+        await ctx.send(CMD_ADMIN_TAKE.format(target.mention, amount))
 
 
 def setup(bot):

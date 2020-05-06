@@ -43,3 +43,22 @@ class EconomyAccount(Base):
 
     def get_balance(self):
         return self.balance / 10000 # Convert to database-friendly format
+
+    def add_credit(self, session, credit_amount, name="Not specified"):
+        credit_amount *= 10000 # Convert to database-friendly format
+        print(self.balance, type(self.balance))
+        self.balance += credit_amount
+        self.transactions.append(
+            EconomyTransaction(name=name, credit=credit_amount)
+        )
+        session.add(self)
+        session.commit()
+
+    def add_debit(self, session, debit_amount, name="Not specified"):
+        debit_amount *= 10000 # Convert to database-friendly format
+        self.balance -= debit_amount
+        self.transactions.append(
+            EconomyTransaction(name=name, debit=debit_amount)
+        )
+        session.add(self)
+        session.commit()
