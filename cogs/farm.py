@@ -1,6 +1,6 @@
 import logging
 
-import discord
+import discord, schedule
 from discord.ext import commands
 
 from messages.farm import *
@@ -40,9 +40,9 @@ class Farm(commands.Cog):
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "**{0.name}** `[B: {1:.2f} gil | S: {2:.2f} gil]`\n".format(plant, bp, sp)
+            _str = "**{0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest.\n".format(plant, bp, sp)
             final_str += _str
-        await ctx.send("{}".format(final_str))
+        await ctx.send("***__Global market prices:__***\n{}".format(final_str))
 
     @commands.command()
     @commands.is_owner()
@@ -178,6 +178,14 @@ class Farm(commands.Cog):
         pass
 
 
+def refresh_prices(bot):
+    logging.info("Refreshing farm market prices...")
+    all_plants = Plant.get_plants(bot.db_session)
+    for plant in all_plants:
+        plant.randomize_price(bot.db_session, commit_on_execution=False)
+    bot.db_session.commit()
+
+
 def setup(bot):
     bot.add_cog(Farm(bot))
-
+    schedule.every().hour.do(refresh_prices, bot)

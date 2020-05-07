@@ -1,4 +1,6 @@
 import logging
+
+import schedule
 from discord.ext import commands
 
 from sqlalchemy import create_engine
@@ -19,6 +21,7 @@ class BotCore(commands.Bot):
 
     async def on_message(self, message):
         logging.debug("Message from {0.author}: {0.content}".format(message))
+        schedule.run_pending()
 
         await self.process_commands(message)
 
