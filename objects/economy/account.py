@@ -1,7 +1,6 @@
 from datetime import datetime
 import logging
 
-from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 from sqlalchemy.orm import relationship
 

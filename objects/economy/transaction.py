@@ -1,6 +1,5 @@
 from datetime import datetime
 
-from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Integer, BigInteger, MetaData, DateTime, ForeignKey, String
 from sqlalchemy.orm import relationship
 
