@@ -46,6 +46,27 @@ class Economy(commands.Cog):
         await ctx.send(CMD_ADMIN_TAKE.format(target, amount))
 
     @commands.command()
+    @commands.is_owner()
+    async def reconsolidateall(self, ctx, target: discord.Member=None):
+        if target is None:
+            all_accounts = EconomyAccount.get_all_economy_accounts(self.bot.db_session)
+            inconsistent_accounts = 0
+            for account in all_accounts:
+                # We disable committing here to optimize SQL query execution time
+                result = account.reconsolidate_balance(self.bot.db_session, commit_on_execution=False)
+                if not result:
+                    inconsistent_accounts += 1
+            self.bot.db_session.commit()
+            await ctx.send(CMD_RECONSOLIDATE_MASS.format(len(all_accounts), inconsistent_accounts))
+        else:
+            target_account = EconomyAccount.get_economy_account(target, self.bot.db_session)
+            result = target_account.reconsolidate_balance(self.bot.db_session)
+            if result:
+                await ctx.send(CMD_RECONSOLIDATE_TRUE.format(target))
+            else:
+                await ctx.send(CMD_RECONSOLIDATE_FALSE.format(target))
+
+    @commands.command()
     async def give(self, ctx, amount: float, target: discord.Member):
         if amount < 0:
             await ctx.send(CMD_GIVE_INVALID_AMOUNT)

@@ -1,4 +1,5 @@
 from datetime import datetime
+import logging
 
 from sqlalchemy import create_engine
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
@@ -22,6 +23,10 @@ class EconomyAccount(Base):
 
     def __repr__(self):
         return "<User id={0.id}, enabled={0.enabled}, balance={0.balance}>".format(self)
+
+    @staticmethod
+    def get_all_economy_accounts(session):
+        return session.query(EconomyAccount).all()
 
     @staticmethod
     def get_economy_account(user, session):
@@ -52,6 +57,22 @@ class EconomyAccount(Base):
 
     def get_balance(self):
         return self.balance / 10000 # Convert to database-friendly format
+
+    def reconsolidate_balance(self, session, commit_on_execution=True):
+        _balance = 0
+        for transaction in self.transactions:
+            _balance += transaction.credit
+            _balance -= transaction.debit
+
+        result = self.balance == _balance
+
+        self.balance = _balance
+        session.add(self)
+        logging.info("Consolidating account of user ID: {}".format(self.user_id))
+        if commit_on_execution:
+            session.commit()
+
+        return result
 
     def add_credit(self, session, credit_amount, name="Not specified"):
         credit_amount *= 10000 # Convert to database-friendly format
