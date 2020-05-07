@@ -64,6 +64,12 @@ def main():
 
     # Create all tables if they do not exist
     base.Base.metadata.create_all(bot.engine)
+
+    # Seed active seeders
+    for SEEDER in ACTIVE_SEEDERS:
+        k = importlib.import_module(SEEDER)
+        s = getattr(k, "seed")
+        s(bot.db_session)
     
     # Add our cogs in ACTIVE_COGS (see config)
     logging.info("Loading cogs...")

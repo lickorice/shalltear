@@ -18,6 +18,14 @@ ACTIVE_COGS = [
 ACTIVE_OBJECTS = [
     "objects.economy.account",
     "objects.economy.transaction",
+    "objects.economy.farm.farm",
+    "objects.economy.farm.harvest",
+    "objects.economy.farm.plot",
+    "objects.economy.farm.plant",
+]
+
+ACTIVE_SEEDERS = [
+    "objects.economy.farm.seeders.plant",
 ]
 
 TRANSFER_TAX = 0.01
