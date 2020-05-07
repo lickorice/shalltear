@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 import logging
 
 from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, DateTime, ForeignKey
@@ -39,4 +39,28 @@ class Plot(Base):
             return status_str
         status_str += "Currently planted: {}\n".format(self.plant.name)
         status_str += "Expected yield: {} units\n".format(self.plant.base_harvest)
+        status_str += "{}\n".format(self.get_remaining_harvest_time())
         return status_str
+
+    def is_harvestable(self):
+        harvest_datetime = self.planted_at + timedelta(seconds=self.plant.growing_seconds)
+        time_difference = harvest_datetime - datetime.now()
+        return time_difference < timedelta()
+
+    def get_remaining_harvest_time(self):
+        harvest_datetime = self.planted_at + timedelta(seconds=self.plant.growing_seconds)
+        time_difference = harvest_datetime - datetime.now()
+        if time_difference < timedelta():
+            return "Can now be harvested."
+        result_str = []
+        hours, rem = divmod(time_difference.seconds, 3600)
+        minutes, seconds = divmod(rem, 60)
+        if time_difference.days:
+            result_str.append("{}d".format(time_difference.days))
+        if hours:
+            result_str.append("{}h".format(hours))
+        if minutes:
+            result_str.append("{}m".format(minutes))
+        if seconds:
+            result_str.append("{}s".format(seconds))
+        return "Can be harvested in {}".format(', '.join(result_str))
