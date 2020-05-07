@@ -30,15 +30,19 @@ class EconomyAccount(Base):
         return session.query(EconomyAccount).all()
 
     @staticmethod
-    def get_economy_account(user, session) -> EconomyAccount:
+    def get_top_economy_accounts(session, number=20):
+        return session.query(EconomyAccount).order_by(EconomyAccount.balance.desc()).all()
+
+    @staticmethod
+    def get_economy_account(user, session, create_if_not_exists=True) -> EconomyAccount:
         user_id = user.id
         result = session.query(EconomyAccount).filter_by(user_id=user_id).first()
-        if result is None:
+        if result is None and create_if_not_exists:
             return EconomyAccount.create_economy_account(user, session, not user.bot)
         return result
 
     @staticmethod
-    def create_economy_account(user, session, enabled):
+    def create_economy_account(user, session, enabled, commit_on_execution=True):
         user_id = user.id
         new_account = EconomyAccount(
             user_id = user_id,
@@ -49,7 +53,8 @@ class EconomyAccount(Base):
             EconomyTransaction(name="Initial Balance", credit=100000)
         ]
         session.add(new_account)
-        session.commit()
+        if commit_on_execution:
+            session.commit()
         return new_account
 
     def has_balance(self, amount, raw=False):

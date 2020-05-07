@@ -21,6 +21,36 @@ class Economy(commands.Cog):
         account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         await ctx.send(CMD_GIL.format(target, account.get_balance()))
 
+    @commands.command(aliases=["$top",])
+    async def giltop(self, ctx):
+        top_accounts = EconomyAccount.get_top_economy_accounts(self.bot.db_session)
+
+        embed = discord.Embed(title="Top 20 Wealthiest Users", color=0xffd700)
+        rank = 1
+        for account in top_accounts:
+            user = self.bot.get_user(account.user_id)
+            user_name = "#{1} **{0.name}#{0.discriminator}**".format(user, rank)
+            gil_amount = "💵 {0:.2f} gil".format(account.get_balance())
+            embed.add_field(name=user_name, value=gil_amount, inline=False)
+            rank += 1
+
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    @commands.is_owner()
+    async def registerall(self, ctx):
+        registered = 0
+        for member in ctx.guild.members:
+            k = EconomyAccount.get_economy_account(member, self.bot.db_session, create_if_not_exists=False)
+            if k is None:
+                k = EconomyAccount.create_economy_account(
+                    member, self.bot.db_session,
+                    member.bot or member.system, commit_on_execution=False
+                )
+                registered += 1
+        self.bot.db_session.commit()
+        logging.info("Registered {0} new accounts in the Economy database.".format(registered))
+
     @commands.command()
     @commands.is_owner()
     async def admingive(self, ctx, amount: float, target: discord.Member=None):
