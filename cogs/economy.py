@@ -23,9 +23,9 @@ class Economy(commands.Cog):
 
     @commands.command(aliases=["$top",])
     async def giltop(self, ctx):
-        top_accounts = EconomyAccount.get_top_economy_accounts(self.bot.db_session)
+        top_accounts = EconomyAccount.get_top_economy_accounts(self.bot.db_session, number=10)
 
-        embed = discord.Embed(title="Top 20 Wealthiest Users", color=0xffd700)
+        embed = discord.Embed(title="Top 10 Wealthiest Users", color=0xffd700)
         rank = 1
         for account in top_accounts:
             user = self.bot.get_user(account.user_id)

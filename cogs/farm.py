@@ -1,4 +1,5 @@
 import logging
+from datetime import timedelta
 
 import discord, schedule
 from discord.ext import commands
@@ -18,7 +19,7 @@ class Farm(commands.Cog):
         if target is None:
             target = ctx.author
         _farm = ORMFarm.get_farm(target, self.bot.db_session)
-        await ctx.send(MSG_FARM_STATUS.format(target, len(_farm.plots), _farm))
+        await ctx.send(MSG_FARM_STATUS.format(target, len(_farm.plots)))
 
     @commands.command(aliases=["fpo"])
     async def farmplots(self, ctx):
@@ -40,7 +41,7 @@ class Farm(commands.Cog):
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "**{0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest.\n".format(plant, bp, sp)
+            _str = "**{0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
             final_str += _str
         await ctx.send("***__Global market prices:__***\n{}".format(final_str))
 
@@ -173,9 +174,25 @@ class Farm(commands.Cog):
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()
         ))
 
-    @commands.command(aliases=["fsa"])
-    async def farmsellall(self, ctx):
-        pass
+    # @commands.command(aliases=["fsa"])
+    # async def farmsellall(self, ctx):
+    #     pass
+
+
+def get_growing_time_string(growing_time_in_seconds):
+    growing_time = timedelta(seconds=growing_time_in_seconds)
+    result_str = []
+    hours, rem = divmod(growing_time.seconds, 3600)
+    minutes, seconds = divmod(rem, 60)
+    if growing_time.days:
+        result_str.append("{}d".format(growing_time.days))
+    if hours:
+        result_str.append("{}h".format(hours))
+    if minutes:
+        result_str.append("{}m".format(minutes))
+    if seconds:
+        result_str.append("{}s".format(seconds))
+    return ', '.join(result_str)
 
 
 def refresh_prices(bot):
