@@ -18,3 +18,5 @@ ACTIVE_OBJECTS = [
     "objects.economy.account",
     "objects.economy.transaction",
 ]
+
+TRANSFER_TAX = 0.01
