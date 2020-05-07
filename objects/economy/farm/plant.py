@@ -48,3 +48,10 @@ class Plant(Base):
         session.add(self)
         if commit_on_execution:
             session.commit()
+
+    def set_base_price(self, session, price, raw=False):
+        if not raw:
+            price *= 10000
+        self.base_sell_price = price
+        session.add(self)
+        session.commit()

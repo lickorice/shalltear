@@ -21,7 +21,7 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(target, self.bot.db_session)
         await ctx.send(MSG_FARM_STATUS.format(target, len(_farm.plots)))
 
-    @commands.command(aliases=["fpo"])
+    @commands.command(aliases=["fp"])
     async def farmplots(self, ctx):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)
@@ -45,6 +45,15 @@ class Farm(commands.Cog):
             final_str += _str
         await ctx.send("***__Global market prices:__***\n{}".format(final_str))
 
+    @commands.command()
+    @commands.is_owner()
+    async def setplantprice(self, ctx, plant_name, base_price: float):
+        _plant = Plant.get_plant(self.bot.db_session, plant_name)
+        if _plant is None:
+            await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
+        _plant.set_base_price(self.bot.db_session, base_price)
+    
     @commands.command()
     @commands.is_owner()
     async def refreshplantprices(self, ctx):
