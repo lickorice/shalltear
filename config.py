@@ -12,6 +12,7 @@ ACTIVE_COGS = [
     "cogs.admin",
     "cogs.core",
     "cogs.economy",
+    "cogs.farm",
 ]
 
 ACTIVE_OBJECTS = [
