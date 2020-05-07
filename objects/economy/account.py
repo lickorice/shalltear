@@ -74,8 +74,9 @@ class EconomyAccount(Base):
 
         return result
 
-    def add_credit(self, session, credit_amount, name="Not specified"):
-        credit_amount *= 10000 # Convert to database-friendly format
+    def add_credit(self, session, credit_amount, name="Not specified", raw=False):
+        if not raw:
+            credit_amount *= 10000 # Convert to database-friendly format
         self.balance += credit_amount
         self.transactions.append(
             EconomyTransaction(name=name, credit=credit_amount)
@@ -83,8 +84,9 @@ class EconomyAccount(Base):
         session.add(self)
         session.commit()
 
-    def add_debit(self, session, debit_amount, name="Not specified"):
-        debit_amount *= 10000 # Convert to database-friendly format
+    def add_debit(self, session, debit_amount, name="Not specified", raw=False):
+        if not raw:
+            debit_amount *= 10000 # Convert to database-friendly format
         self.balance -= debit_amount
         self.transactions.append(
             EconomyTransaction(name=name, debit=debit_amount)
