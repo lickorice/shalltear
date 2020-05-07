@@ -13,10 +13,14 @@ class Farm(Base):
 
     id = Column(Integer, primary_key=True)
     user_id = Column(BigInteger, unique=True)
+
+    current_harvest = Column(BigInteger, default=0)
+    harvest_capacity = Column(BigInteger, default=100)
     
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+    harvests = relationship("Harvest", back_populates="farm")
     plots = relationship("Plot", back_populates="farm")
 
     def __repr__(self):

@@ -1,4 +1,5 @@
 from datetime import datetime
+from random import randint
 import logging
 
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
@@ -11,9 +12,11 @@ class Plant(Base):
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(String(64)) # Turnip
+    name = Column(String(64), unique=True) # Turnip
     buy_price = Column(BigInteger) # 50000
-    base_sell_price = Column(BigInteger) # 500000
+    base_harvest = Column(Integer) # 10
+
+    base_sell_price = Column(BigInteger) # 20000
     current_sell_price = Column(BigInteger) # Set dynamically
     randomness_factor = Column(BigInteger) # / 10000
 
@@ -21,3 +24,22 @@ class Plant(Base):
 
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+
+    @staticmethod
+    def get_plants(session):
+        all_plants = session.query(Plant).all()
+        return all_plants
+    
+    def get_buy_price(self):
+        return self.buy_price / 10000
+    
+    def get_sell_price(self):
+        return self.current_sell_price / 10000
+
+    def randomize_price(self, session, commit_on_execution=True):
+        _r = self.randomness_factor
+        factor = randint(10000-_r, 10000+_r) / 10000
+        self.current_sell_price = int(self.base_sell_price*factor)
+        session.add(self)
+        if commit_on_execution:
+            session.commit()
