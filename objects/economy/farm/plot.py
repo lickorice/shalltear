@@ -25,3 +25,18 @@ class Plot(Base):
 
     def __repr__(self):
         return "<Plot plant={0.plant}, planted_at={0.planted_at}>".format(self)
+
+    def plant_to_plot(self, _plant, session):
+        self.plant = _plant
+        self.planted_at = datetime.now()
+        session.add(self)
+        session.commit()
+    
+    def get_status_str(self):
+        status_str = ""
+        if self.plant is None:
+            status_str += "No plant currently planted."
+            return status_str
+        status_str += "Currently planted: {}\n".format(self.plant.name)
+        status_str += "Expected yield: {} units\n".format(self.plant.base_harvest)
+        return status_str

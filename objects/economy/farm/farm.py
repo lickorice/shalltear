@@ -46,3 +46,12 @@ class Farm(Base):
         if result is None:
             return Farm.create_farm(user, session)
         return result
+
+    def get_all_plots(self, session):
+        return self.plots
+
+    def get_available_plot(self, session):
+        results = [i for i in self.plots if i.plant is None]
+        if (len(results)) is 0:
+            return None
+        return results[0]

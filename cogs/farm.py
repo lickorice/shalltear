@@ -4,6 +4,7 @@ import discord
 from discord.ext import commands
 
 from messages.farm import *
+from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 
@@ -20,9 +21,17 @@ class Farm(commands.Cog):
         await ctx.send(MSG_FARM_STATUS.format(target, len(_farm.plots), _farm))
 
     @commands.command(aliases=["fpo"])
-    async def farmplots(self, ctx, target: discord.Member=None):
-        if target is None:
-            target = ctx.author
+    async def farmplots(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _plots = _farm.get_all_plots(self.bot.db_session)
+        
+        plot_str = ""
+        plot_count = 1
+        for _plot in _plots:
+            plot_str += "Plot #{}:\n```{}```\n".format(plot_count, _plot.get_status_str())
+            plot_count += 1
+        
+        await ctx.send(MSG_PLOTS_STATUS.format(ctx.author, plot_str))
 
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx):
@@ -50,8 +59,29 @@ class Farm(commands.Cog):
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
     @commands.command(aliases=["fpa"])
-    async def farmplant(self, ctx):
-        pass
+    async def farmplant(self, ctx, plant_name):
+        _plant = Plant.get_plant(self.bot.db_session, plant_name)
+        if _plant is None:
+            await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
+        account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        if not account.has_balance(_plant.buy_price, raw=True):
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, account.get_balance()))
+            return
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _plot = _farm.get_available_plot(self.bot.db_session)
+        if _plot is None:
+            await ctx.send(MSG_PLOT_NOT_FOUND.format(ctx.author))
+            return
+
+        account.add_debit(
+            self.bot.db_session, _plant.buy_price,
+            name="B:{0.id}={0.buy_price}".format(_plant),
+            raw=True,
+        )
+
+        _plot.plant_to_plot(_plant, self.bot.db_session)
+        await ctx.send(MSG_PLOT_PLANT.format(ctx.author, _plant, account.get_balance()))
 
     @commands.command(aliases=["fh"])
     async def farmharvest(self, ctx):

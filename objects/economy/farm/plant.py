@@ -29,6 +29,11 @@ class Plant(Base):
     def get_plants(session):
         all_plants = session.query(Plant).all()
         return all_plants
+
+    @staticmethod
+    def get_plant(session, name):
+        plant = session.query(Plant).filter(Plant.name.ilike(name)).first()
+        return plant
     
     def get_buy_price(self):
         return self.buy_price / 10000
