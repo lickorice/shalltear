@@ -28,7 +28,7 @@ class EconomyAccount(Base):
         return session.query(EconomyAccount).all()
 
     @staticmethod
-    def get_economy_account(user, session):
+    def get_economy_account(user, session) -> EconomyAccount:
         user_id = user.id
         result = session.query(EconomyAccount).filter_by(user_id=user_id).first()
         if result is None:
