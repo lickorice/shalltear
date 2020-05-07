@@ -50,8 +50,9 @@ class EconomyAccount(Base):
         session.commit()
         return new_account
 
-    def has_balance(self, amount):
-        amount *= 10000
+    def has_balance(self, amount, raw=False):
+        if not raw:
+            amount *= 10000
         return amount < self.balance
 
     def get_balance(self):
