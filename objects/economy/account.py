@@ -31,7 +31,7 @@ class EconomyAccount(Base):
 
     @staticmethod
     def get_top_economy_accounts(session, number=20):
-        return session.query(EconomyAccount).order_by(EconomyAccount.balance.desc()).all()
+        return session.query(EconomyAccount).order_by(EconomyAccount.balance.desc()).all()[:number]
 
     @staticmethod
     def get_economy_account(user, session, create_if_not_exists=True) -> EconomyAccount:
