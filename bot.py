@@ -1,6 +1,6 @@
 import logging
 
-import schedule
+import discord, schedule
 from discord.ext import commands
 
 from sqlalchemy import create_engine
@@ -18,6 +18,7 @@ class BotCore(commands.AutoShardedBot):
 
     async def on_ready(self):
         logging.info("Logged on as [{}]".format(self.user))
+        logging.info("Using discord.py version {}".format(discord.__version__))
 
     async def on_message(self, message):
         logging.debug("Message from {0.author}: {0.content}".format(message))
