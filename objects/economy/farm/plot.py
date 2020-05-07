@@ -5,6 +5,7 @@ from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, Dat
 from sqlalchemy.orm import relationship
 
 from objects.base import Base
+from objects.economy.farm.harvest import Harvest
 
 
 class Plot(Base):
@@ -43,6 +44,7 @@ class Plot(Base):
         return status_str
 
     def is_harvestable(self):
+        if self.plant is None: return False
         harvest_datetime = self.planted_at + timedelta(seconds=self.plant.growing_seconds)
         time_difference = harvest_datetime - datetime.now()
         return time_difference < timedelta()
@@ -64,3 +66,15 @@ class Plot(Base):
         if seconds:
             result_str.append("{}s".format(seconds))
         return "Can be harvested in {}".format(', '.join(result_str))
+
+    def get_harvest(self, session):
+        new_harvest = Harvest(
+            amount = self.plant.base_harvest,
+            plant = self.plant,
+            farm = self.farm,
+        )
+        self.plant = None
+        self.planted_at = None
+        session.add(self)
+        session.add(new_harvest)
+        return new_harvest

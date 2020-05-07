@@ -33,7 +33,7 @@ class Farm(Base):
             user_id = user_id,
         )
         new_farm.plots = [
-            Plot()
+            Plot(), Plot(), Plot() # Default 3 plots
         ]
         session.add(new_farm)
         session.commit()

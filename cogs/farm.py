@@ -83,9 +83,59 @@ class Farm(commands.Cog):
         _plot.plant_to_plot(_plant, self.bot.db_session)
         await ctx.send(MSG_PLOT_PLANT.format(ctx.author, _plant, account.get_balance()))
 
+    @commands.command(aliases=["sh"])
+    async def showharvests(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        
+        harvested_plants = set([i.plant for i in _farm.harvests])
+
+        id_to_plant_name = {_plant.id: _plant.name for _plant in harvested_plants}
+        total_harvests = {_plant.id: 0 for _plant in harvested_plants}
+        
+        for harvest in _farm.harvests:
+            total_harvests[harvest.plant.id] += harvest.amount
+
+        harvest_str = ""
+
+        for harvest in total_harvests:
+            harvest_str += "**{0}**, {1} units\n".format(
+                id_to_plant_name[harvest],
+                total_harvests[harvest]
+            )
+        
+        await ctx.send(MSG_SHOW_HARVESTS.format(ctx.author, harvest_str))
+
     @commands.command(aliases=["fh"])
     async def farmharvest(self, ctx):
-        pass
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _plots = _farm.get_all_plots(self.bot.db_session)
+        harvestable_plots = []
+        for _plot in _plots:
+            if _plot.plant is None: continue
+            if _plot.is_harvestable(): harvestable_plots.append(_plot)
+        
+        harvestable_plants = set([_plot.plant for _plot in harvestable_plots])
+        id_to_plant_name = {_plant.id: _plant.name for _plant in harvestable_plants}
+        total_harvests = {_plant.id: 0 for _plant in harvestable_plants}
+
+        if len(harvestable_plots) is 0:
+            await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
+            return
+
+        for _plot in harvestable_plots:
+            harvest = _plot.get_harvest(self.bot.db_session)
+            total_harvests[harvest.plant.id] += harvest.amount
+
+        self.bot.db_session.commit()
+
+        harvest_str = ""
+        for harvest in total_harvests:
+            harvest_str += "**{0}**, {1} units\n".format(
+                id_to_plant_name[harvest],
+                total_harvests[harvest]
+            )
+
+        await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx):

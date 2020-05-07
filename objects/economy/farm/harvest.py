@@ -19,7 +19,5 @@ class Harvest(Base):
     farm_id = Column(BigInteger, ForeignKey('farm_farms.id'))
     farm = relationship("Farm", back_populates="harvests")
 
-    growing_seconds = Column(BigInteger)
-
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
