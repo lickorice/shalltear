@@ -88,10 +88,15 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         
         harvested_plants = set([i.plant for i in _farm.harvests])
+        print(_farm.harvests)
 
         id_to_plant_name = {_plant.id: _plant.name for _plant in harvested_plants}
         total_harvests = {_plant.id: 0 for _plant in harvested_plants}
         
+        if len(_farm.harvests) == 0:
+            await ctx.send(MSG_SHOW_HARVESTS_NONE.format(ctx.author))
+            return
+
         for harvest in _farm.harvests:
             total_harvests[harvest.plant.id] += harvest.amount
 
@@ -138,8 +143,35 @@ class Farm(commands.Cog):
         await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
 
     @commands.command(aliases=["fs"])
-    async def farmsell(self, ctx):
-        pass
+    async def farmsell(self, ctx, plant_name):
+        _plant = Plant.get_plant(self.bot.db_session, plant_name)
+        if _plant is None:
+            await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
+
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+
+        total_amount = 0
+        for i in range(len(_farm.harvests))[::-1]:
+            if _farm.harvests[i].plant.id == _plant.id:
+                total_amount += _farm.harvests[i].amount
+                del _farm.harvests[i]
+
+        if total_amount == 0:
+            await ctx.send(MSG_SELL_NONE.format(ctx.author, _plant.name))
+            return
+        
+        raw_credit = total_amount * _plant.current_sell_price
+        _account.add_credit(
+            self.bot.db_session, raw_credit,
+            name="S:{0.id}={0.current_sell_price}".format(_plant),
+            raw=True
+        )
+
+        await ctx.send(MSG_SELL_SUCCESS.format(
+            ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()
+        ))
 
     @commands.command(aliases=["fsa"])
     async def farmsellall(self, ctx):

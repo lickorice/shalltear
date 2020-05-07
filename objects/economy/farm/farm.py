@@ -20,7 +20,7 @@ class Farm(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    harvests = relationship("Harvest", back_populates="farm")
+    harvests = relationship("Harvest", back_populates="farm", cascade="all, delete, delete-orphan")
     plots = relationship("Plot", back_populates="farm")
 
     def __repr__(self):
