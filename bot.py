@@ -9,7 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from config import COMMAND_PREFIX
 
 
-class BotCore(commands.Bot):
+class BotCore(commands.AutoShardedBot):
 
     # TODO: Remove hardcoding on engine URI
     engine = create_engine("sqlite:///data.db", echo=False)
