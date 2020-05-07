@@ -55,7 +55,7 @@ class EconomyAccount(Base):
     def has_balance(self, amount, raw=False):
         if not raw:
             amount *= 10000
-        return amount < self.balance
+        return amount <= self.balance
 
     def get_balance(self):
         return self.balance / 10000 # Convert to database-friendly format
