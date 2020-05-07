@@ -55,7 +55,6 @@ class EconomyAccount(Base):
 
     def add_credit(self, session, credit_amount, name="Not specified"):
         credit_amount *= 10000 # Convert to database-friendly format
-        print(self.balance, type(self.balance))
         self.balance += credit_amount
         self.transactions.append(
             EconomyTransaction(name=name, credit=credit_amount)
