@@ -24,7 +24,7 @@ CURRENT_PLANTS = [
         "buy_price": 100000,
         "base_sell_price": 7000,
         "randomness_factor": 2000,
-        "growing_secon\ds": 600,
+        "growing_seconds": 600,
     },
     {
         "name": "Watermelon",
