@@ -22,8 +22,9 @@ $ pip install -r requirements.txt
 $ py run.py
 ```
 
-## Releases
-There are no releases of the bot at this moment.
-
 ## Changelog
-There are no releases of the bot at this moment.
+### `v0.0.2b`
+- Introduce new plants Potatoes, Pumpkin, Grapes,
+### `v0.0.1b`
+- Add base functionalities for Admin, Core, Economy, and Farm cogs.
+- Introduce plants Turnip, Rice, Strawberry, and Watermelon.
