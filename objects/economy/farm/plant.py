@@ -4,6 +4,7 @@ import logging
 
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 
+from config import DEMAND_DIVISOR
 from objects.base import Base
 from objects.economy.farm.plot import Plot
 from objects.economy.farm.farm import Farm
@@ -68,8 +69,8 @@ class Plant(Base):
         growth_rate = 3600 / min(self.growing_seconds, 3600)
         _demand = self.base_harvest * growth_rate * (_plots)
         logging.info("{}: {}".format(self.name, _demand))
-        self.base_demand = _demand
-        self.current_demand = _demand
+        self.base_demand = max(int(_demand / DEMAND_DIVISOR), 1)
+        self.current_demand = max(int(_demand / DEMAND_DIVISOR), 1)
         
         # Price calculation
         _r = self.randomness_factor
