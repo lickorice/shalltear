@@ -1,5 +1,5 @@
 import logging
-from datetime import timedelta
+from datetime import timedelta, datetime
 
 import discord, schedule
 from discord.ext import commands
@@ -45,9 +45,12 @@ class Farm(commands.Cog):
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "**{0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
+            _str = "**`{0.tag}` - {0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
             final_str += _str
-        await ctx.send("***__Current global market prices:__***\n{}".format(final_str))
+        final_str += "\n*Next market recalculation will be at* __`{0}`__".format(
+            datetime.now().replace(microsecond=0, second=0, minute=0).strftime("%I:%M %p UTC+08:00")
+        )
+        await ctx.send("***Current global market prices:***\n{}".format(final_str))
 
     @commands.command(aliases=["plot$",])
     async def plotprice(self, ctx):
@@ -70,6 +73,19 @@ class Farm(commands.Cog):
         else:
             await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
+    @commands.command()
+    @commands.is_owner()
+    async def setplanttag(self, ctx, plant_name, tag):
+        """(Owner) Set a plant's shorthand tag."""
+        _plant = Plant.get_plant(self.bot.db_session, plant_name)
+        if _plant is None:
+            await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
+        _plant.tag = tag
+        self.bot.db_session.add(_plant)
+        self.bot.db_session.commit()
+        await ctx.send("**Successfully changed plant tag.**")
+    
     @commands.command()
     @commands.is_owner()
     async def setplantprice(self, ctx, plant_name, base_price: float):

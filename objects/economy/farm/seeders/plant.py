@@ -4,6 +4,7 @@ from random import randint
 CURRENT_PLANTS = [
     {
         "name": "Turnip", # 1 gil per 5 mins
+        "tag": "TRNP",
         "base_harvest": 10,
         "buy_price": 50000,
         "base_sell_price": 6000,
@@ -12,6 +13,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Rice", # 1 gil per 5 mins
+        "tag": "RICE",
         "base_harvest": 10,
         "buy_price": 50000,
         "base_sell_price": 6000,
@@ -20,6 +22,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Strawberry", # 2 gil per 5 mins
+        "tag": "STBY",
         "base_harvest": 20,
         "buy_price": 100000,
         "base_sell_price": 7000,
@@ -28,6 +31,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Watermelon", # 4.16 gil per 5 mins
+        "tag": "WTML",
         "base_harvest": 3,
         "buy_price": 1000000,
         "base_sell_price": 500000,
@@ -36,6 +40,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Pumpkin", # 11.11 gil per 5 ins
+        "tag": "PMKN",
         "base_harvest": 1,
         "buy_price": 2000000,
         "base_sell_price": 4000000,
@@ -44,6 +49,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Grapes", # 14.58 gil per 5 mins
+        "tag": "GRPS",
         "base_harvest": 50,
         "buy_price": 2500000,
         "base_sell_price": 120000,
@@ -52,6 +58,7 @@ CURRENT_PLANTS = [
     },
     {
         "name": "Potato", # 3.125 gil per 5 mins
+        "tag": "PTTO",
         "base_harvest": 25,
         "buy_price": 500000,
         "base_sell_price": 27500,
@@ -73,6 +80,7 @@ def seed(session):
         if PLANT["name"] in plant_names: continue # Skip if exists
         session.add(Plant(
             name = PLANT["name"],
+            tag = PLANT["tag"],
             base_harvest = PLANT["base_harvest"],
             buy_price = PLANT["buy_price"],
             base_sell_price = PLANT["base_sell_price"],

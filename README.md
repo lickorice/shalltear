@@ -23,6 +23,9 @@ $ python3 run.py
 ```
 
 ## Changelog
+### `v0.0.3b`
+- `s!plantprices` message now shows time before next interval.
+- Add crop shorthands, such as `TRNP` for Turnip, `PMKN` for Pumpkin, etc. These shorthands can be used to refer to the crops in command usage.
 ### `v0.0.2b`
 - Introduce new plants Potato, Pumpkin, and Grapes.
 - Introduce scaled plot purchasing.

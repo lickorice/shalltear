@@ -14,6 +14,7 @@ class Plant(Base):
     id = Column(Integer, primary_key=True)
 
     name = Column(String(64), unique=True) # Turnip
+    tag = Column(String(4), unique=True) # TRNP
     buy_price = Column(BigInteger) # 50000
     base_harvest = Column(Integer) # 10
 
@@ -34,6 +35,8 @@ class Plant(Base):
     @staticmethod
     def get_plant(session, name):
         plant = session.query(Plant).filter(Plant.name.ilike(name)).first()
+        if plant is None:
+            plant = session.query(Plant).filter(Plant.tag.ilike(name)).first()
         return plant
     
     def get_buy_price(self):
