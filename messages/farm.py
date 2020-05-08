@@ -8,6 +8,8 @@ MSG_HARVEST_SUCCESS = "{0.mention}, you have successfully harvested your plots:\
 MSG_INSUFFICIENT_FUNDS = "{0.mention}, you do not have enough gil. You only have **💵 {1:.2f} gil**"
 MSG_INSUFFICIENT_FUNDS_EXTRA = "{0.mention}, you do not have enough gil. This operation costs **💵 {2:.2f} gil**. You only have **💵 {1:.2f} gil**"
 MSG_PLANT_NOT_FOUND = "**{0.mention}, that plant is not in our database.**"
+MSG_PLANT_PRICES = "`[B: {1:.2f} gil | (Demand: {0.current_demand}/{0.base_demand}) S: {2:.2f} gil]`\nYields **{0.base_harvest}** units per harvest, grows in `{3}`"
+MSG_PLANT_PRICES_FOOTER = "Next market recalculation will be at {0}"
 MSG_PLOTS_STATUS = """**{0.mention}'s Farm:**
 ```
 {1}

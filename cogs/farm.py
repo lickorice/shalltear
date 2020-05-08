@@ -81,16 +81,29 @@ class Farm(commands.Cog):
     async def plantprices(self, ctx):
         """Show the current global plant prices."""
         all_plants = Plant.get_plants(self.bot.db_session)
+
+        embed = discord.Embed(
+            title="-=Current Global Market Prices=-",
+            color=0xffd700
+        )
+
         final_str = ""
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "**`{0.tag}` - {0.name}**: `[B: {1:.2f} gil | (Demand: {0.current_demand}/{0.base_demand}) S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
-            final_str += _str
-        final_str += "\n*Next market recalculation will be at* __`{0}`__".format(
-            (timedelta(hours=1) + datetime.now().replace(microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")
+            embed.add_field(
+                name="**`{0.tag}` - {0.name}**".format(plant),
+                value=MSG_PLANT_PRICES.format(
+                  plant, bp, sp, get_growing_time_string(plant.growing_seconds)  
+                ),
+                inline=False
+            )
+        embed.set_footer(
+            text=MSG_PLANT_PRICES_FOOTER.format(
+                (timedelta(hours=1) + datetime.now().replace(microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")    
+            )
         )
-        await ctx.send("***Current global market prices:***\n{}".format(final_str))
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["plot$",])
     async def plotprice(self, ctx):
