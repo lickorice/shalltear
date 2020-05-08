@@ -51,7 +51,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 7200,
     },
     {
-        "name": "Potatoes", # 3.125 gil per 5 mins
+        "name": "Potato", # 3.125 gil per 5 mins
         "base_harvest": 25,
         "buy_price": 500000,
         "base_sell_price": 27500,
