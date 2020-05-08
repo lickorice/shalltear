@@ -15,6 +15,8 @@ class Farm(Base):
     id = Column(Integer, primary_key=True)
     user_id = Column(BigInteger, unique=True)
 
+    name = Column(String(32), default="Unnamed Farm")
+
     current_harvest = Column(BigInteger, default=0)
     harvest_capacity = Column(BigInteger, default=100)
     

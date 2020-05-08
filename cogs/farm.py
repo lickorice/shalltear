@@ -4,6 +4,7 @@ from datetime import timedelta, datetime
 import discord, schedule
 from discord.ext import commands
 
+from config import FARM_NAME_CHANGE_PRICE
 from messages.farm import *
 from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
@@ -21,7 +22,46 @@ class Farm(commands.Cog):
         if target is None:
             target = ctx.author
         _farm = ORMFarm.get_farm(target, self.bot.db_session)
-        await ctx.send(MSG_FARM_STATUS.format(target, len(_farm.plots)))
+        if _farm.name is None:
+            _farm.name = "Unnamed Farm"
+            self.bot.db_session.add(_farm)
+            self.bot.db_session.commit()
+
+        embed = discord.Embed(
+            title="{0.name}#{0.discriminator}'s farm, {1}".format(target, _farm.name),
+            color=0xffd700
+        )
+
+        embed.add_field(name="Plots", value=len(_farm.plots))
+
+        await ctx.send(embed=embed)
+
+    @commands.command()
+    async def setfarmname(self, ctx, name):
+        """Show target's farm details."""
+        if len(name) > 32:
+            await ctx.send("**{0.mention}, a farm's name can only be 64 characters long.**".format(ctx.author))
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _farm.name = name
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+
+        if not _account.has_balance(FARM_NAME_CHANGE_PRICE, raw=True):
+            await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
+                ctx.author, _account.get_balance(), FARM_NAME_CHANGE_PRICE / 10000
+            ))
+            return
+
+        _account.add_debit(
+            self.bot.db_session, FARM_NAME_CHANGE_PRICE, 
+            name="FARM NAME CHANGE", raw=True
+        )
+
+        self.bot.db_session.add(_farm)
+        self.bot.db_session.commit()
+        
+        await ctx.send("{0.mention}, you successfully named your farm **{1}**. You now only have **💵 {2:.2f} gil**".format(
+            ctx.author, name, _account.get_balance()
+        ))
 
     @commands.command(aliases=["fp"])
     async def farmplots(self, ctx):
