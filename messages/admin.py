@@ -1,0 +1,1 @@
+MSG_SHUT_DOWN = "**Shutting down bot...**"

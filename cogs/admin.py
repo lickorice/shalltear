@@ -4,7 +4,7 @@ import discord
 from discord.ext import commands
 
 from config import *
-from messages.core import *
+from messages.admin import *
 
 
 class Admin(commands.Cog):
@@ -15,7 +15,7 @@ class Admin(commands.Cog):
     @commands.is_owner()
     async def kill(self, ctx):
         """(Owner) Shuts down the bot."""
-        await ctx.send("**Shutting down bot...**")
+        await ctx.send(MSG_SHUT_DOWN)
         await self.bot.logout()
 
     @commands.command(aliases=['rlc',])

@@ -27,7 +27,7 @@ class Plant(Base):
 
     @staticmethod
     def get_plants(session):
-        all_plants = session.query(Plant).all()
+        all_plants = session.query(Plant).order_by(Plant.buy_price).all()
         return all_plants
 
     @staticmethod
