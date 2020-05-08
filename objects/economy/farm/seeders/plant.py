@@ -22,7 +22,7 @@ CURRENT_PLANTS = [
         "name": "Strawberry",
         "base_harvest": 20,
         "buy_price": 100000,
-        "base_sell_price": 5500,
+        "base_sell_price": 7000,
         "randomness_factor": 2000,
         "growing_secon\ds": 600,
     },
