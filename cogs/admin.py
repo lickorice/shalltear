@@ -11,6 +11,12 @@ class Admin(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
 
+    @commands.command()
+    @commands.is_owner()
+    async def kill(self, ctx):
+        await ctx.send("**Shutting down bot...**")
+        await self.bot.logout()
+
     @commands.command(aliases=['rlc',])
     @commands.is_owner()
     async def reloadcogs(self, ctx, *cogs):

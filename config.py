@@ -1,3 +1,6 @@
+# Version
+CURRENT_VERSION = "v0.0.2b"
+
 # Command prefix
 COMMAND_PREFIX = "s!"
 
