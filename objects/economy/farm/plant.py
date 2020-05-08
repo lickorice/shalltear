@@ -47,8 +47,18 @@ class Plant(Base):
     def get_buy_price(self):
         return self.buy_price / 10000
     
-    def get_sell_price(self):
-        return self.current_sell_price / 10000
+    def get_sell_price(self, raw=False):
+        cd, bd = self.current_demand, self.base_demand
+        sell_price = (self.current_sell_price / 2) * 4**((cd**2)/(bd**2))
+        sell_price = int(sell_price)
+        if raw:
+            return sell_price
+        return sell_price / 10000
+
+    def decrement_demand(self, session, amount):
+        self.current_demand = max(self.current_demand - amount, 0)
+        session.add(self)
+        session.commit()
 
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
