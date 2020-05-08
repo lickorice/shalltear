@@ -10,21 +10,27 @@ Make sure to open the terminal in the project's root directory, then, install th
 $ pip install -r requirements.txt
 ```
 
-### Running on Windows
+### Running on Windows / Git Bash
 
 ```cmd
-> python run.py
+> py - 3 run.py
 ```
 
-### Running on Linux / Git Bash
+### Running on Linux
 
 ```bash
-$ py run.py
+$ python3 run.py
 ```
 
 ## Changelog
 ### `v0.0.2b`
-- Introduce new plants Potatoes, Pumpkin, Grapes,
+- Introduce new plants Potato, Pumpkin, and Grapes.
+- Introduce scaled plot purchasing.
+- Add PriceLog object that logs the hourly changes in Plant prices.
+- Allow `farmplant` command to plant on multiple plots at once.
+- Fix `help` command.
+- Add `info`, `kill`, commands.
+- Balance existing Plant prices.
 ### `v0.0.1b`
 - Add base functionalities for Admin, Core, Economy, and Farm cogs.
 - Introduce plants Turnip, Rice, Strawberry, and Watermelon.
