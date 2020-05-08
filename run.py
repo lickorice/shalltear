@@ -56,6 +56,7 @@ def main():
 
     # Instantiate our bot object
     bot = BotCore(command_prefix=COMMAND_PREFIX)
+    bot.remove_command("help") # Overwrite default help command
 
     # We need to preload the objects to add them to
     # possible migrations
