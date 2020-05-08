@@ -85,10 +85,10 @@ class Farm(commands.Cog):
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "**`{0.tag}` - {0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
+            _str = "**`{0.tag}` - {0.name}**: `[B: {1:.2f} gil | (Demand: {0.current_demand}/{0.base_demand}) S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
             final_str += _str
         final_str += "\n*Next market recalculation will be at* __`{0}`__".format(
-            datetime.now().replace(microsecond=0, second=0, minute=0).strftime("%I:%M %p UTC+08:00")
+            (timedelta(hours=1) + datetime.now().replace(microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")
         )
         await ctx.send("***Current global market prices:***\n{}".format(final_str))
 

@@ -5,6 +5,8 @@ import logging
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 
 from objects.base import Base
+from objects.economy.farm.plot import Plot
+from objects.economy.farm.farm import Farm
 from objects.economy.farm.pricelog import PriceLog
 
 
@@ -23,6 +25,9 @@ class Plant(Base):
     randomness_factor = Column(BigInteger) # / 10000
 
     growing_seconds = Column(BigInteger)
+
+    current_demand = Column(BigInteger)
+    base_demand = Column(BigInteger)
 
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
@@ -46,9 +51,21 @@ class Plant(Base):
         return self.current_sell_price / 10000
 
     def randomize_price(self, session, commit_on_execution=True):
+        _farms = Farm.get_farms_count(session)
+        _plots = Plot.get_plots_count(session)
+        
+        # Demand calculation
+        growth_rate = 3600 / min(self.growing_seconds, 3600)
+        _demand = self.base_harvest * growth_rate * (_plots)
+        logging.info("{}: {}".format(self.name, _demand))
+        self.base_demand = _demand
+        self.current_demand = _demand
+        
+        # Price calculation
         _r = self.randomness_factor
         factor = randint(10000-_r, 10000+_r) / 10000
         self.current_sell_price = int(self.base_sell_price*factor)
+
         session.add(self)
         PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)
         if commit_on_execution:

@@ -16,6 +16,7 @@ class PriceLog(Base):
     plant_id = Column(BigInteger, ForeignKey('farm_plants.id'))
     plant = relationship("Plant")
     price = Column(BigInteger)
+    demand = Column(BigInteger)
 
     def __repr__(self):
         return "<PriceLog plant_name={0.plant.name}, price={0.price}>".format(self)
@@ -24,7 +25,8 @@ class PriceLog(Base):
     def log_price(plant, session, commit_on_execution=True):
         new_price_log = PriceLog(
             plant_id = plant.id,
-            price = plant.current_sell_price
+            price = plant.current_sell_price,
+            demand = plant.base_demand
         )
         session.add(new_price_log)
         if commit_on_execution:

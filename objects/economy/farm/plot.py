@@ -27,6 +27,10 @@ class Plot(Base):
     def __repr__(self):
         return "<Plot plant={0.plant}, planted_at={0.planted_at}>".format(self)
 
+    @staticmethod
+    def get_plots_count(session):
+        return session.query(Plot).count()
+
     def plant_to_plot(self, _plant, session, commit_on_execution=True):
         self.plant = _plant
         self.planted_at = datetime.now()
