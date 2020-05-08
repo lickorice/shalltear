@@ -14,7 +14,7 @@ class Economy(commands.Cog):
 
     @commands.command(aliases=["$",])
     async def gil(self, ctx, target: discord.Member=None):
-        """Returns current account's balance."""
+        """Returns target account's balance."""
         if target is None:
             target = ctx.author
         # Get current economy account
@@ -23,6 +23,7 @@ class Economy(commands.Cog):
 
     @commands.command(aliases=["$top",])
     async def giltop(self, ctx):
+        """Returns top 10 global accounts according to gil-on-hand."""
         top_accounts = EconomyAccount.get_top_economy_accounts(self.bot.db_session, number=10)
 
         embed = discord.Embed(title="Top 10 Wealthiest Users", color=0xffd700)
@@ -39,6 +40,7 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def registerall(self, ctx):
+        """(Owner) Gives all users in guild economy accounts."""
         registered = 0
         for member in ctx.guild.members:
             k = EconomyAccount.get_economy_account(member, self.bot.db_session, create_if_not_exists=False)
@@ -54,6 +56,7 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def admingive(self, ctx, amount: float, target: discord.Member=None):
+        """(Owner) Grant target gil."""
         if amount < 0:
             await ctx.send(CMD_GIVE_INVALID_AMOUNT)
             return
@@ -66,6 +69,7 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def admintake(self, ctx, amount: float, target: discord.Member=None):
+        """(Owner) Deduct target's gil."""
         if amount < 0:
             await ctx.send(CMD_GIVE_INVALID_AMOUNT)
             return
@@ -78,6 +82,7 @@ class Economy(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def reconsolidateall(self, ctx, target: discord.Member=None):
+        """(Owner) Reconsolidate the whole database's balances."""
         if target is None:
             all_accounts = EconomyAccount.get_all_economy_accounts(self.bot.db_session)
             inconsistent_accounts = 0
@@ -98,9 +103,12 @@ class Economy(commands.Cog):
 
     @commands.command()
     async def give(self, ctx, amount: float, target: discord.Member):
+        """Give gil to another user, with a 1 percent tax deduction.."""
         if amount < 0:
             await ctx.send(CMD_GIVE_INVALID_AMOUNT)
             return
+        if target == ctx.author:
+            await ctx.send("**{0.mention}, you can't transfer money to yourself.**")
         credit = amount * (1 - TRANSFER_TAX)
         debit = amount
 

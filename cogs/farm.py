@@ -16,6 +16,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["f"])
     async def farm(self, ctx, target: discord.Member=None):
+        """Show target's farm details."""
         if target is None:
             target = ctx.author
         _farm = ORMFarm.get_farm(target, self.bot.db_session)
@@ -23,6 +24,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["fp"])
     async def farmplots(self, ctx):
+        """Show the details of your plots."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)
         
@@ -36,6 +38,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx):
+        """Show the current global plant prices."""
         all_plants = Plant.get_plants(self.bot.db_session)
         final_str = ""
         for plant in all_plants:
@@ -47,6 +50,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["plot$",])
     async def plotprice(self, ctx):
+        """Show the price of the next plot."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_plot_price()
         await ctx.send("{0.mention}, your next plot costs **💵 {1:.2f} gil**.".format(ctx.author, result))
@@ -54,6 +58,7 @@ class Farm(commands.Cog):
     @commands.cooldown(1, 5, type=commands.BucketType.user)
     @commands.command()
     async def plotbuy(self, ctx):
+        """Buy a new plot."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
         price = _farm.get_next_plot_price(raw=True)
@@ -67,6 +72,7 @@ class Farm(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def setplantprice(self, ctx, plant_name, base_price: float):
+        """(Owner) Set a plant's base unit price."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
@@ -76,6 +82,7 @@ class Farm(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def purgeplots(self, ctx, target: discord.Member=None):
+        """(Owner) Purge the plants planted in a target's plots."""
         if target == None:
             target = ctx.author
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
@@ -89,6 +96,7 @@ class Farm(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def refreshplantprices(self, ctx):
+        """(Owner) Manually refresh the global market prices."""
         all_plants = Plant.get_plants(self.bot.db_session)
         for plant in all_plants:
             plant.randomize_price(self.bot.db_session)
@@ -102,6 +110,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["fpa"])
     async def farmplant(self, ctx, plant_name, plant_count=1):
+        """Plant a crop on a number of your available plots."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
@@ -138,6 +147,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["sh"])
     async def showharvests(self, ctx):
+        """Show your harvest inventory."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         
         harvested_plants = set([i.plant for i in _farm.harvests])
@@ -165,6 +175,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["fh"])
     async def farmharvest(self, ctx):
+        """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)
         harvestable_plots = []
@@ -197,6 +208,7 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):
+        """Sell all of your target crop."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))

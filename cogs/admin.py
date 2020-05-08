@@ -14,13 +14,14 @@ class Admin(commands.Cog):
     @commands.command()
     @commands.is_owner()
     async def kill(self, ctx):
+        """(Owner) Shuts down the bot."""
         await ctx.send("**Shutting down bot...**")
         await self.bot.logout()
 
     @commands.command(aliases=['rlc',])
     @commands.is_owner()
     async def reloadcogs(self, ctx, *cogs):
-        """Reload specified cogs. If no cog is specified, reloads all cogs."""
+        """(Owner) Reload specified cogs. If no cog is specified, reloads all cogs."""
         if not len(cogs):
             to_reload_cogs = ACTIVE_COGS
         else:

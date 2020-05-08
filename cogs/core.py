@@ -35,7 +35,7 @@ class Core(commands.Cog):
             await ctx.send("Do `s!help <command>` for more information.")
         else:
             if command not in [c.name for c in all_commands]:
-                await ctx.send(MSG_CMD_NOT_FOUND.format(ctx.author.id))
+                await ctx.send(MSG_CMD_NOT_FOUND.format(ctx.author))
                 return
             cmd = [c for c in all_commands if c.name == command][0]
             if cmd.aliases:
