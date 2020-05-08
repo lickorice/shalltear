@@ -4,6 +4,7 @@ import logging
 from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
+from config import BASE_PLOT_PRICE, PLOT_PRICE_FACTOR
 from objects.base import Base
 from objects.economy.farm.plot import Plot
 
@@ -50,8 +51,21 @@ class Farm(Base):
     def get_all_plots(self, session):
         return self.plots
 
-    def get_available_plot(self, session):
+    def get_available_plots(self, session):
         results = [i for i in self.plots if i.plant is None]
-        if (len(results)) is 0:
-            return None
-        return results[0]
+        return results
+
+    def get_plot_count(self):
+        return len(self.plots)
+
+    def get_next_plot_price(self, raw=False):
+        plot_count = self.get_plot_count() - 2
+        plot_price = int( BASE_PLOT_PRICE * (plot_count ** PLOT_PRICE_FACTOR) )
+        if not raw:
+            return plot_price / 10000
+        return plot_price
+
+    def add_plot(self, session):
+        self.plots.append(Plot())
+        session.add(self)
+        session.commit()

@@ -116,7 +116,7 @@ class Economy(commands.Cog):
         target_account.add_credit(self.bot.db_session, credit, "T:{}".format(ctx.author.id))
         author_account.add_debit(self.bot.db_session, debit, "T:{}".format(target.id))
 
-        await ctx.send(CMD_GIVE_SUCCESS.format(target, credit, ctx.author))
+        await ctx.send(CMD_GIVE_SUCCESS.format(ctx.author, credit, target))
 
 
 def setup(bot):

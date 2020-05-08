@@ -27,21 +27,17 @@ class Plot(Base):
     def __repr__(self):
         return "<Plot plant={0.plant}, planted_at={0.planted_at}>".format(self)
 
-    def plant_to_plot(self, _plant, session):
+    def plant_to_plot(self, _plant, session, commit_on_execution=True):
         self.plant = _plant
         self.planted_at = datetime.now()
         session.add(self)
-        session.commit()
+        if commit_on_execution:
+            session.commit()
     
     def get_status_str(self):
-        status_str = ""
         if self.plant is None:
-            status_str += "No plant currently planted."
-            return status_str
-        status_str += "Currently planted: {}\n".format(self.plant.name)
-        status_str += "Expected yield: {} units\n".format(self.plant.base_harvest)
-        status_str += "{}\n".format(self.get_remaining_harvest_time())
-        return status_str
+            return "-- EMPTY --"
+        return "{0} - {1}".format(self.plant.name, self.get_remaining_harvest_time())
 
     def is_harvestable(self):
         if self.plant is None: return False
@@ -53,7 +49,7 @@ class Plot(Base):
         harvest_datetime = self.planted_at + timedelta(seconds=self.plant.growing_seconds)
         time_difference = harvest_datetime - datetime.now()
         if time_difference < timedelta():
-            return "Can now be harvested."
+            return "[HARVEST NOW]"
         result_str = []
         hours, rem = divmod(time_difference.seconds, 3600)
         minutes, seconds = divmod(rem, 60)
@@ -65,7 +61,7 @@ class Plot(Base):
             result_str.append("{}m".format(minutes))
         if seconds:
             result_str.append("{}s".format(seconds))
-        return "Can be harvested in {}".format(', '.join(result_str))
+        return "Ready in [{}]".format(', '.join(result_str))
 
     def get_harvest(self, session):
         new_harvest = Harvest(

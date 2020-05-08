@@ -29,9 +29,9 @@ class Farm(commands.Cog):
         plot_str = ""
         plot_count = 1
         for _plot in _plots:
-            plot_str += "Plot #{}:\n```{}```\n".format(plot_count, _plot.get_status_str())
+            plot_str += "Plot #{}: {}\n".format(plot_count, _plot.get_status_str())
             plot_count += 1
-        
+        ""
         await ctx.send(MSG_PLOTS_STATUS.format(ctx.author, plot_str))
 
     @commands.command(aliases=["p$",])
@@ -43,7 +43,26 @@ class Farm(commands.Cog):
             sp = plant.get_sell_price()
             _str = "**{0.name}**: `[B: {1:.2f} gil | S: {2:.2f} gil]` - Yields **{0.base_harvest}** units per harvest, grows in `{3}`.\n".format(plant, bp, sp, get_growing_time_string(plant.growing_seconds))
             final_str += _str
-        await ctx.send("***__Global market prices:__***\n{}".format(final_str))
+        await ctx.send("***__Current global market prices:__***\n{}".format(final_str))
+
+    @commands.command(aliases=["plot$",])
+    async def plotprice(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        result = _farm.get_next_plot_price()
+        await ctx.send("{0.mention}, your next plot costs **💵 {1:.2f} gil**.".format(ctx.author, result))
+
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    @commands.command()
+    async def plotbuy(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        price = _farm.get_next_plot_price(raw=True)
+        if _account.has_balance(price, raw=True):
+            _farm.add_plot(self.bot.db_session)
+            _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
+            await ctx.send("{0.mention}, you have successfully bought a new plot! Your new balance is now **💵 {1:.2f} gil**.".format(ctx.author, _account.get_balance()))
+        else:
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
     @commands.command()
     @commands.is_owner()
@@ -53,6 +72,19 @@ class Farm(commands.Cog):
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
             return
         _plant.set_base_price(self.bot.db_session, base_price)
+
+    @commands.command()
+    @commands.is_owner()
+    async def purgeplots(self, ctx, target: discord.Member=None):
+        if target == None:
+            target = ctx.author
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        for _plot in _farm.plots:
+            _plot.plant = None
+            _plot.planted_at = None
+            self.bot.db_session.add(_plot)
+        self.bot.db_session.add(_plot)
+        await ctx.send("**{0.mention}'s plots have been purged.**".format(target))
     
     @commands.command()
     @commands.is_owner()
@@ -69,29 +101,40 @@ class Farm(commands.Cog):
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
     @commands.command(aliases=["fpa"])
-    async def farmplant(self, ctx, plant_name):
+    async def farmplant(self, ctx, plant_name, plant_count=1):
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
             return
-        account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
-        if not account.has_balance(_plant.buy_price, raw=True):
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, account.get_balance()))
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        
+        total_price = _plant.buy_price * plant_count
+        
+        if not _account.has_balance(total_price, raw=True):
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
             return
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        _plot = _farm.get_available_plot(self.bot.db_session)
-        if _plot is None:
+        _plots = _farm.get_available_plots(self.bot.db_session)
+        if len(_plots) == None:
             await ctx.send(MSG_PLOT_NOT_FOUND.format(ctx.author))
             return
+        if len(_plots) < plant_count:
+            await ctx.send("**{0.mention}, you do not have enough available plots for that.** You only have **{1}** available and you're trying to plant on **{2}**.".format(
+                ctx.author, len(_plots), plant_count
+            ))
+            return
 
-        account.add_debit(
-            self.bot.db_session, _plant.buy_price,
+        _account.add_debit(
+            self.bot.db_session, total_price,
             name="B:{0.id}={0.buy_price}".format(_plant),
             raw=True,
         )
 
-        _plot.plant_to_plot(_plant, self.bot.db_session)
-        await ctx.send(MSG_PLOT_PLANT.format(ctx.author, _plant, account.get_balance()))
+        for _plot in _plots[:plant_count]:
+            _plot.plant_to_plot(_plant, self.bot.db_session, commit_on_execution=False)
+        self.bot.db_session.commit()
+
+        await ctx.send(MSG_PLOT_PLANT.format(ctx.author, _plant, plant_count, total_price/10000, _account.get_balance()))
 
     @commands.command(aliases=["sh"])
     async def showharvests(self, ctx):
@@ -214,4 +257,4 @@ def refresh_prices(bot):
 
 def setup(bot):
     bot.add_cog(Farm(bot))
-    schedule.every().hour.do(refresh_prices, bot)
+    schedule.every().hour.at(":00").do(refresh_prices, bot)

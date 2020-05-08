@@ -8,10 +8,12 @@ MSG_HARVEST_SUCCESS = "{0.mention}, you have successfully harvested your plots:\
 MSG_INSUFFICIENT_FUNDS = "{0.mention}, you do not have enough gil. You only have **💵 {1:.2f} gil**"
 MSG_PLANT_NOT_FOUND = "**{0.mention}, that plant is not in our database.**"
 MSG_PLOTS_STATUS = """**{0.mention}'s Farm:**
+```
 {1}
+```
 """
 MSG_PLOT_NOT_FOUND = "**{0.mention}, you have no available plots to plant on.**"
-MSG_PLOT_PLANT = "{0.mention}, you have planted **{1.name}** in one of your plots. You now only have **💵 {2:.2f} gil**."
+MSG_PLOT_PLANT = "{0.mention}, you have planted **{1.name}** in {2} of your plots for **💵 {3:.2f} gil**. You now only have **💵 {4:.2f} gil**."
 MSG_SELL_NONE = "{0.mention}, you have no **{1}** to sell."
 MSG_SELL_SUCCESS = "{0.mention}, you sold **{1} units** of **{2.name}** for a total of **💵 {3:.2f} gil**. You now have **💵 {4:.2f} gil**."
 MSG_SHOW_HARVESTS_NONE = "{0.mention}, you have no harvested crops."
