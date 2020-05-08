@@ -17,6 +17,9 @@ class PriceLog(Base):
     plant = relationship("Plant")
     price = Column(BigInteger)
 
+    def __repr__(self):
+        return "<PriceLog plant_name={0.plant.name}, price={0.price}>".format(self)
+
     @staticmethod
     def log_price(plant, session, commit_on_execution=True):
         new_price_log = PriceLog(

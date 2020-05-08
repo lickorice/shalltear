@@ -21,3 +21,6 @@ class Harvest(Base):
 
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
+    
+    def __repr__(self):
+        return "<Harvest plant_name={0.plant.name}, amount={0.amount}>".format(self)
