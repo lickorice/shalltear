@@ -8,6 +8,7 @@ from messages.farm import *
 from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
+from objects.economy.farm.pricelog import PriceLog
 
 
 class Farm(commands.Cog):
@@ -206,6 +207,15 @@ class Farm(commands.Cog):
 
         await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
 
+    @commands.command(aliases=["pstats", "pstat"])
+    async def plantstats(self, ctx, plant_name):
+        """Check plant price stats for the past 48 refreshes."""
+        _plant = Plant.get_plant(self.bot.db_session, plant_name)
+        if _plant is None:
+            await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
+        logging.info(PriceLog.get_plant_price_logs(_plant, self.bot.db_session))
+
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):
         """Sell all of your target crop."""
@@ -237,10 +247,6 @@ class Farm(commands.Cog):
         await ctx.send(MSG_SELL_SUCCESS.format(
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()
         ))
-
-    # @commands.command(aliases=["fsa"])
-    # async def farmsellall(self, ctx):
-    #     pass
 
 
 def get_growing_time_string(growing_time_in_seconds):

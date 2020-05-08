@@ -1,0 +1,33 @@
+from datetime import datetime, timedelta
+import logging
+
+from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+
+from objects.base import Base
+
+class PriceLog(Base):
+    __tablename__ = 'farm_price_logs'
+
+    id = Column(Integer, primary_key=True)
+
+    refreshed_at = Column(DateTime, default=datetime.now)
+
+    plant_id = Column(BigInteger, ForeignKey('farm_plants.id'))
+    plant = relationship("Plant")
+    price = Column(BigInteger)
+
+    @staticmethod
+    def log_price(plant, session, commit_on_execution=True):
+        new_price_log = PriceLog(
+            plant_id = plant.id,
+            price = plant.current_sell_price
+        )
+        session.add(new_price_log)
+        if commit_on_execution:
+            session.commit()
+
+    @staticmethod
+    def get_plant_price_logs(plant, session):
+        return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).all()
+        

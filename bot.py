@@ -26,5 +26,6 @@ class BotCore(commands.AutoShardedBot):
 
         await self.process_commands(message)
 
-    async def on_command_error(self, ctx, err):
-        logging.error("Command error: {0} [author: {1.author}][cmd: {1.command}]".format(err, ctx))
+    # async def on_command_error(self, ctx, err):
+    #     logging.error("Command error: {0} [author: {1.author}][cmd: {1.command}]".format(err, ctx))
+    #     await ctx.send("**{0.mention}, that's an invalid command format.**".format(ctx.author))

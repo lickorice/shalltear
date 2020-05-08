@@ -5,6 +5,7 @@ import logging
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 
 from objects.base import Base
+from objects.economy.farm.pricelog import PriceLog
 
 
 class Plant(Base):
@@ -46,6 +47,7 @@ class Plant(Base):
         factor = randint(10000-_r, 10000+_r) / 10000
         self.current_sell_price = int(self.base_sell_price*factor)
         session.add(self)
+        PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)
         if commit_on_execution:
             session.commit()
 
