@@ -97,7 +97,7 @@ CURRENT_PLANTS = [
         "tag": "COCO",
         "base_harvest": 20,
         "buy_price": 100000000,
-        "base_sell_price": 1940000,
+        "base_sell_price": 19400000,
         "randomness_factor": 2000,
         "growing_seconds": 57600,
     },
