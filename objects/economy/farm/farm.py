@@ -82,6 +82,14 @@ class Farm(Base):
             return plot_price / 10000
         return plot_price
 
+    def has_storage(self, amount):
+        return (self.current_harvest + amount <= self.harvest_capacity)
+
+    def decrease_storage(self, session, amount):
+        self.current_harvest = max(self.current_harvest - amount, 0)
+        session.add(self)
+        session.commit()
+
     def add_plot(self, session):
         self.plots.append(Plot())
         session.add(self)

@@ -72,14 +72,31 @@ class Plot(Base):
             first_digit = False
         return "Fully grown in [{}]".format(', '.join(result_str))
 
-    def get_harvest(self, session):
+    def harvest(self, session, commit_on_execution=True):
+        if not self.is_harvestable():
+            return None
         new_harvest = Harvest(
             amount = self.plant.base_harvest,
             plant = self.plant,
             farm = self.farm,
         )
+
+        # Increment storage space used
+        self.farm.current_harvest += self.get_harvest_amount()
+
+        # Remove crop planted
         self.plant = None
         self.planted_at = None
+
+        # Database actions
         session.add(self)
+        session.add(self.farm)
         session.add(new_harvest)
+        if commit_on_execution:
+            session.commit()
         return new_harvest
+
+    def get_harvest_amount(self):
+        if not self.is_harvestable():
+            return 0
+        return self.plant.base_harvest

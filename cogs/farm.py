@@ -326,37 +326,78 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
-    async def farmharvest(self, ctx):
+    async def farmharvest(self, ctx, harvest_range=None):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        _plots = _farm.get_all_plots(self.bot.db_session)
-        harvestable_plots = []
-        for _plot in _plots:
-            if _plot.plant is None: continue
-            if _plot.is_harvestable(): harvestable_plots.append(_plot)
-        
-        harvestable_plants = set([_plot.plant for _plot in harvestable_plots])
-        id_to_plant_name = {_plant.id: _plant.name for _plant in harvestable_plants}
-        total_harvests = {_plant.id: 0 for _plant in harvestable_plants}
+        plot_count = len(_farm.plots)
 
-        if len(harvestable_plots) == 0:
-            await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
+        all_plots = False
+
+        if harvest_range is not None:
+            try:
+                harvest_range = list(map(int, harvest_range.split('-')))  
+            except ValueError:
+                await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+                return
+        else:
+            all_plots = True
+            harvest_range = [1, plot_count]
+        
+        # Command validation:
+        if len(harvest_range) > 2:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        
+        if len(harvest_range) == 1:
+            harvest_range.append(harvest_range[0])
+
+        if harvest_range[1] < harvest_range[0]:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        
+        if not (0 <= harvest_range[0]-1 < plot_count) or not (0 <= harvest_range[1]-1 < plot_count):
+            await ctx.send(MSG_DISCARD_OUT_OF_RANGE.format(ctx.author))
             return
 
-        for _plot in harvestable_plots:
-            harvest = _plot.get_harvest(self.bot.db_session)
-            total_harvests[harvest.plant.id] += harvest.amount
+        storage_needed = 0
+        for i in range(harvest_range[0]-1, harvest_range[1]):
+            storage_needed += _farm.plots[i].get_harvest_amount()
+        
+        if not _farm.has_storage(storage_needed):
+            await ctx.send(MSG_HARVEST_NOT_ENOUGH_CAPACITY.format(
+                ctx.author,
+                max(_farm.harvest_capacity - _farm.current_harvest, 0),
+                storage_needed
+            ))
+            return
+
+        # Actual harvesting
+    
+        harvest_stats = {}
+        has_harvest = False
+
+        for i in range(harvest_range[0]-1, harvest_range[1]):
+            _harvest = _farm.plots[i].harvest(self.bot.db_session, commit_on_execution=False)
+            if _harvest is None:
+                continue
+
+            has_harvest = True
+            if _harvest.plant.name not in harvest_stats:
+                harvest_stats[_harvest.plant.name] = 0
+            harvest_stats[_harvest.plant.name] += _harvest.amount
 
         self.bot.db_session.commit()
 
-        harvest_str = ""
-        for harvest in total_harvests:
-            harvest_str += "**{0}**, {1} units\n".format(
-                id_to_plant_name[harvest],
-                total_harvests[harvest]
-            )
-
-        await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
+        if has_harvest:
+            harvest_str = ""
+            for plant_name in harvest_stats:
+                harvest_str += "**{0}**, {1} units\n".format(
+                    plant_name, harvest_stats[plant_name]
+                )
+            await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
+        else:
+            await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
+        
 
     @commands.command(aliases=["pstats", "pstat"])
     async def plantstats(self, ctx, plant_name):
@@ -396,6 +437,7 @@ class Farm(commands.Cog):
         )
         
         _plant.decrement_demand(self.bot.db_session, total_amount)
+        _farm.decrease_storage(self.bot.db_session, total_amount)
 
         await ctx.send(MSG_SELL_SUCCESS.format(
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()

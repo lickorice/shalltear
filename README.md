@@ -29,6 +29,7 @@ $ python3 run.py
     - `s!trashplots` on its own will scrap **ALL your plots**.
     - `s!trashplots 5` will scrap **Plot #0005 only**.
     - `s!trashplots 5-13` (no spaces!) will scrap **Plot #0005 to Plot #0013**.
+- The command `s!farmharvest` can now **selectively harvest plots**. The mechanics used will be the same as above.
 - `s!showharvests` now sends an Embed.
 ### `v0.0.3b`
 - **The Economy simulation engine has been revamped.** Every time the market refreshes, the demand is also recalculated. At full demand, the current sale price will be at **double**, and at zero demand, the current sale price will be at **half**.
