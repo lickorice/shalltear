@@ -120,7 +120,7 @@ class Farm(commands.Cog):
             value="```{}```".format(plot_str)
         )
 
-        embed.set_footer(text="Showing 20 plots per page.")
+        embed.set_footer(text="Showing 20 plots per page. s!fp [page_number]")
 
         await ctx.send(embed=embed)
 
