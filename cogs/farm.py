@@ -166,7 +166,7 @@ class Farm(commands.Cog):
         self.bot.db_session.add(_plot)
         await ctx.send("**{0.mention}'s plots have been purged.**".format(target))
     
-    @commands.command(aliases=["tp"])
+    @commands.command()
     async def trashplots(self, ctx, scrap_range=None):
         """Discard the plants on your plots. No refunds.
         Scrap range can be:
