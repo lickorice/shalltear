@@ -34,6 +34,12 @@ class Farm(Base):
         return session.query(Farm).count()
     
     @staticmethod
+    def get_top_farms(session, number=10):
+        all_farms = session.query(Farm).all()
+        all_farms = sorted(all_farms, key=lambda x:len(x.plots), reverse=True)
+        return all_farms[:number]
+    
+    @staticmethod
     def get_all_farms(session):
         return session.query(Farm).all()
 

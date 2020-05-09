@@ -1,5 +1,6 @@
 import logging
 from datetime import timedelta, datetime
+from math import log10
 
 import discord, schedule
 from discord.ext import commands
@@ -36,6 +37,27 @@ class Farm(commands.Cog):
             name="Storage", 
             value="{0.current_harvest}/{0.harvest_capacity}".format(_farm)
         )
+
+        await ctx.send(embed=embed)
+
+    @commands.command(aliases=["ftop"])
+    async def farmtop(self, ctx):
+        """Shows top farms in the server."""
+        top_farms = ORMFarm.get_top_farms(self.bot.db_session)
+
+        embed = discord.Embed(title="Top 10 Most Bountiful Farms", color=0xffd700)
+        rank = 1
+        for _farm in top_farms:
+            plot_count = len(_farm.plots)
+            leaf_count = int(log10(plot_count))+1
+            user = self.bot.get_user(_farm.user_id)
+            try:
+                row_name = "#{1} **{2}** - ({0.name}#{0.discriminator})".format(user, rank, _farm.get_name(self.bot.db_session))
+            except AttributeError:
+                row_name = "#{1} **{2}** - ({0})".format("Unknown User", rank, _farm.get_name(self.bot.db_session))
+            plot_count = "🌱"*leaf_count + " {0} Plots".format(len(_farm.plots))
+            embed.add_field(name=row_name, value=plot_count, inline=False)
+            rank += 1
 
         await ctx.send(embed=embed)
 
