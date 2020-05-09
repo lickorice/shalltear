@@ -9,7 +9,7 @@ MSG_FARM_STATUS = """{0.mention}'s farm: **{1.name}**
 Plot count: {2}
 ```
 """
-MSG_HARVEST_NOT_ENOUGH_CAPACITY = "{0.mention}, you do not have enough storage. You only have **{1}** available storage space for crops. You are trying to harvest a total of **{2}** units of crops. You can use `s!silobuy` to upgrade your storage, "
+MSG_HARVEST_NOT_ENOUGH_CAPACITY = "{0.mention}, you do not have enough storage. You only have **{1}** available storage space for crops. You are trying to harvest a total of **{2}** units of crops. You can use `s!silobuy` to upgrade your storage."
 MSG_HARVEST_NONE = "{0.mention}, you have no harvestable crops."
 MSG_HARVEST_SUCCESS = "{0.mention}, you have successfully harvested your plots:\n{1}"
 MSG_INSUFFICIENT_FUNDS = "{0.mention}, you do not have enough gil. You only have **💵 {1:.2f} gil**"
