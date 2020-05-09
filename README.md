@@ -25,6 +25,8 @@ $ python3 run.py
 ## Changelog
 ### `v0.0.4b`
 - Introduce new plants Wheat, Tomato, and Sugarcane
+- **Introduce a new crop storage system.** All farms will start with 100 storage, and each new storage upgrade will add an additional 100 storage to your farm. Storage upgrade prices scale (much like plot prices, but are more forgiving) as you purchase new upgrades.
+- Add new commands `s!siloprice [s!silo$]` and `s!silobuy`, to check the price of your next storage upgrade and to buy it, respectively. `s!silobuy`, however, has a cooldown of 1 second.
 - Add new command `s!trashplots` to discard crops planted in your plots.
     - `s!trashplots` on its own will scrap **ALL your plots**.
     - `s!trashplots 5` will scrap **Plot #0005 only**.
