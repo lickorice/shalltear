@@ -3,7 +3,7 @@ from random import randint
 
 CURRENT_PLANTS = [
     {
-        "name": "Turnip", # 1 gil per 5 mins
+        "name": "Turnip",
         "tag": "TRNP",
         "base_harvest": 10,
         "buy_price": 50000,
@@ -12,7 +12,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 300,
     },
     {
-        "name": "Rice", # 1 gil per 5 mins
+        "name": "Rice",
         "tag": "RICE",
         "base_harvest": 10,
         "buy_price": 50000,
@@ -21,7 +21,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 300,
     },
     {
-        "name": "Strawberry", # 2 gil per 5 mins
+        "name": "Strawberry",
         "tag": "STBY",
         "base_harvest": 20,
         "buy_price": 100000,
@@ -30,7 +30,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 600,
     },
     {
-        "name": "Watermelon", # 4.16 gil per 5 mins
+        "name": "Watermelon",
         "tag": "WTML",
         "base_harvest": 3,
         "buy_price": 1000000,
@@ -39,7 +39,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 3600,
     },
     {
-        "name": "Pumpkin", # 11.11 gil per 5 ins
+        "name": "Pumpkin",
         "tag": "PMKN",
         "base_harvest": 1,
         "buy_price": 2000000,
@@ -48,7 +48,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 5400,
     },
     {
-        "name": "Grapes", # 14.58 gil per 5 mins
+        "name": "Grapes",
         "tag": "GRPS",
         "base_harvest": 50,
         "buy_price": 2500000,
@@ -57,7 +57,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 7200,
     },
     {
-        "name": "Potato", # 3.125 gil per 5 mins
+        "name": "Potato",
         "tag": "PTTO",
         "base_harvest": 25,
         "buy_price": 500000,
@@ -66,7 +66,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 1800,
     },
     {
-        "name": "Wheat", # 62.5 gil per 5 mins
+        "name": "Wheat",
         "tag": "WHET",
         "base_harvest": 50,
         "buy_price": 1000000,
@@ -75,7 +75,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 60,
     },
     {
-        "name": "Tomato", # 25 gil per 5 mins
+        "name": "Tomato",
         "tag": "TMTO",
         "base_harvest": 50,
         "buy_price": 2000000,
@@ -84,7 +84,7 @@ CURRENT_PLANTS = [
         "growing_seconds": 600,
     },
     {
-        "name": "Sugarcane", # 20 gil per 5 mins
+        "name": "Sugarcane",
         "tag": "SGRC",
         "base_harvest": 100,
         "buy_price": 10000000,
@@ -93,13 +93,40 @@ CURRENT_PLANTS = [
         "growing_seconds": 28800,
     },
     {
-        "name": "Coconut", # 20 gil per 5 mins
+        "name": "Coconut",
         "tag": "COCO",
         "base_harvest": 20,
         "buy_price": 100000000,
         "base_sell_price": 7500000,
         "randomness_factor": 2000,
         "growing_seconds": 57600,
+    },
+    {
+        "name": "Banana",
+        "tag": "BNNA",
+        "base_harvest": 25,
+        "buy_price": 50000000,
+        "base_sell_price": 260000,
+        "randomness_factor": 5000,
+        "growing_seconds": 900,
+    },
+    {
+        "name": "Lemon",
+        "tag": "LMON",
+        "base_harvest": 75,
+        "buy_price": 10000000,
+        "base_sell_price": 170000,
+        "randomness_factor": 2000,
+        "growing_seconds": 1800,
+    },
+    {
+        "name": "Hops",
+        "tag": "HOPS",
+        "base_harvest": 50,
+        "buy_price": 50000000,
+        "base_sell_price": 1300000,
+        "randomness_factor": 2000,
+        "growing_seconds": 2700,
     },
 ]
 

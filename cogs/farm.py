@@ -131,32 +131,52 @@ class Farm(commands.Cog):
         # ))
 
     @commands.command(aliases=["p$",])
-    async def plantprices(self, ctx):
+    async def plantprices(self, ctx, plant_name=None):
         """Show the current global plant prices."""
         all_plants = Plant.get_plants(self.bot.db_session)
+        if plant_name is not None:
+            _plant = Plant.get_plant(self.bot.db_session, plant_name)
+            
+            if _plant is None:
+                ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+                return
 
-        embed = discord.Embed(
-            title="-=Current Global Market Prices=-",
-            color=0xffd700
-        )
-
-        final_str = ""
-        for plant in all_plants:
-            bp = plant.get_buy_price()
-            sp = plant.get_sell_price()
+            embed = discord.Embed(
+                title="-=Current {0} Market Prices=-".format(_plant.name),
+                color=0xffd700
+            )
+            bp = _plant.get_buy_price()
+            sp = _plant.get_sell_price()
             embed.add_field(
-                name="**`{0.tag}` - {0.name}**".format(plant),
+                name="**`{0.tag}` - {0.name}**".format(_plant),
                 value=MSG_PLANT_PRICES.format(
-                  plant, bp, sp, get_growing_time_string(plant.growing_seconds)  
+                  _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
                 ),
                 inline=False
             )
-        embed.set_footer(
-            text=MSG_PLANT_PRICES_FOOTER.format(
-                (timedelta(hours=1) + datetime.now().replace(
-                    microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")    
+        else:
+            embed = discord.Embed(
+                title="-=Current Global Market Prices=-",
+                color=0xffd700
             )
-        )
+
+            final_str = ""
+            for _plant in all_plants:
+                bp = _plant.get_buy_price()
+                sp = _plant.get_sell_price()
+                embed.add_field(
+                    name="**`{0.tag}` - {0.name}**".format(_plant),
+                    value=MSG_PLANT_PRICES.format(
+                    _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
+                    ),
+                    inline=False
+                )
+            embed.set_footer(
+                text=MSG_PLANT_PRICES_FOOTER.format(
+                    (timedelta(hours=1) + datetime.now().replace(
+                        microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")    
+                )
+            )
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["plot$",])
