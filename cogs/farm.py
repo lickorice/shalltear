@@ -19,6 +19,7 @@ class Farm(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
 
+    # TODO: Remove this command later on
     @commands.command()
     @commands.is_owner()
     async def migrate(self, ctx):
@@ -184,7 +185,7 @@ class Farm(commands.Cog):
         ]
 
         # Make sure page number is in bounds
-        page_number = min(page_number, plot_count)
+        page_number = min(page_number, len(paginated_plots))
         page_number = max(page_number, 1)
         
         plot_str = ""
@@ -210,9 +211,15 @@ class Farm(commands.Cog):
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx, plant_name=None):
         """Show the current global plant prices."""
-        all_plants = Plant.get_plants(self.bot.db_session)
-        if plant_name is not None:
+        try:
+            page_number = int(plant_name)
+            plant_name = None
+        except TypeError:
+            page_number = 1
+        except ValueError:
             _plant = Plant.get_plant(self.bot.db_session, plant_name)
+
+        if plant_name is not None:
             _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
             
             if _plant is None:
@@ -235,13 +242,27 @@ class Farm(commands.Cog):
                 inline=False
             )
         else:
+            all_plants = Plant.get_plants(self.bot.db_session)
+
+            plant_count = len(all_plants)
+
+            paginated_plants = [
+                all_plants[i:i+10] for i in range(0, plant_count, 10)
+            ]
+
+            # Make sure page number is in bounds
+            page_number = min(page_number, len(paginated_plants))
+            page_number = max(page_number, 1)
+
             embed = discord.Embed(
-                title="-=Current Global Market Prices=-",
+                title="-=Current Global Market Prices=-\nPage {0} of {1}".format(
+                    page_number, len(paginated_plants)
+                ),
                 color=0xffd700
             )
 
             final_str = ""
-            for _plant in all_plants:
+            for _plant in paginated_plants[page_number-1]:
                 bp = _plant.get_buy_price()
                 sp = _plant.get_sell_price()
                 embed.add_field(
