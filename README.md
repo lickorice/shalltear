@@ -24,7 +24,7 @@ $ python3 run.py
 
 ## Changelog
 ### `v0.0.4b`
-- Introduce new plants Wheat, Tomato, Sugarcane, and Coconut
+- Introduce new plants Wheat, Tomato, Sugarcane, and Coconut.
 - **Introduce a new crop storage system.** All farms will start with 100 storage, and each new storage upgrade will add an additional 100 storage to your farm. Storage upgrade prices scale (much like plot prices, but are more forgiving) as you purchase new upgrades.
 - Add new commands `s!siloprice [s!silo$]` and `s!silobuy`, to check the price of your next storage upgrade and to buy it, respectively. `s!silobuy`, however, has a cooldown of 1 second.
 - Add new commands `s!farmtop [s!ftop]` to view top farms globally.
@@ -32,7 +32,7 @@ $ python3 run.py
     - `s!trashplots` on its own will scrap **ALL your plots**.
     - `s!trashplots 5` will scrap **Plot #0005 only**.
     - `s!trashplots 5-13` (no spaces!) will scrap **Plot #0005 to Plot #0013**.
-- The command `s!farmharvest` can now **selectively harvest plots**. The mechanics used will be the same as above.
+- The command `s!farmharvest` can now **selectively harvest plots**. The mechanics used will be the same as above, in `s!trashplots`.
 - `s!farmplots [page]` now sends an Embed, and is paginated.
 - `s!showharvests` now sends an Embed.
 ### `v0.0.3b`
