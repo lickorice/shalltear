@@ -92,6 +92,15 @@ CURRENT_PLANTS = [
         "randomness_factor": 2000,
         "growing_seconds": 28800,
     },
+    {
+        "name": "Coconut", # 20 gil per 5 mins
+        "tag": "COCO",
+        "base_harvest": 20,
+        "buy_price": 100000000,
+        "base_sell_price": 1940000,
+        "randomness_factor": 2000,
+        "growing_seconds": 57600,
+    },
 ]
 
 def get_selling_price(plant):
