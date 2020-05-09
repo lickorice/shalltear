@@ -31,7 +31,10 @@ class Farm(commands.Cog):
         )
 
         embed.add_field(name="Plots", value=len(_farm.plots))
-        embed.add_field(name="Storage", value="{0.current_harvest}/{0.harvest_capacity}".format(_farm))
+        embed.add_field(
+            name="Storage", 
+            value="{0.current_harvest}/{0.harvest_capacity}".format(_farm)
+        )
 
         await ctx.send(embed=embed)
 
@@ -39,7 +42,7 @@ class Farm(commands.Cog):
     async def setfarmname(self, ctx, name):
         """Show target's farm details."""
         if len(name) > 32:
-            await ctx.send("**{0.mention}, a farm's name can only be 64 characters long.**".format(ctx.author))
+            await ctx.send(MSG_FARM_RENAME_NAME_TOO_LONG.format(ctx.author))
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _farm.name = name
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
@@ -58,7 +61,7 @@ class Farm(commands.Cog):
         self.bot.db_session.add(_farm)
         self.bot.db_session.commit()
         
-        await ctx.send("{0.mention}, you successfully named your farm **{1}**. You now only have **💵 {2:.2f} gil**".format(
+        await ctx.send(MSG_FARM_RENAME_SUCCESS.format(
             ctx.author, name, _account.get_balance()
         ))
 
@@ -98,7 +101,8 @@ class Farm(commands.Cog):
             )
         embed.set_footer(
             text=MSG_PLANT_PRICES_FOOTER.format(
-                (timedelta(hours=1) + datetime.now().replace(microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")    
+                (timedelta(hours=1) + datetime.now().replace(
+                    microsecond=0, second=0, minute=0)).strftime("%I:%M %p UTC+08:00")    
             )
         )
         await ctx.send(embed=embed)
@@ -108,7 +112,7 @@ class Farm(commands.Cog):
         """Show the price of the next plot."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_plot_price()
-        await ctx.send("{0.mention}, your next plot costs **💵 {1:.2f} gil**.".format(ctx.author, result))
+        await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, result))
 
     @commands.cooldown(1, 1, type=commands.BucketType.user)
     @commands.command()
@@ -120,7 +124,7 @@ class Farm(commands.Cog):
         if _account.has_balance(price, raw=True):
             _farm.add_plot(self.bot.db_session)
             _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
-            await ctx.send("{0.mention}, you have successfully bought a new plot! Your new balance is now **💵 {1:.2f} gil**.".format(ctx.author, _account.get_balance()))
+            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
         else:
             await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
@@ -211,9 +215,7 @@ class Farm(commands.Cog):
             await ctx.send(MSG_PLOT_NOT_FOUND.format(ctx.author))
             return
         if len(_plots) < plant_count:
-            await ctx.send("**{0.mention}, you do not have enough available plots for that.** You only have **{1}** available and you're trying to plant on **{2}**.".format(
-                ctx.author, len(_plots), plant_count
-            ))
+            await ctx.send(MSG_PLANT_NO_PLOTS.format(ctx.author, len(_plots), plant_count))
             return
 
         _account.add_debit(
@@ -226,7 +228,13 @@ class Farm(commands.Cog):
             _plot.plant_to_plot(_plant, self.bot.db_session, commit_on_execution=False)
         self.bot.db_session.commit()
 
-        await ctx.send(MSG_PLOT_PLANT.format(ctx.author, _plant, plant_count, total_price/10000, _account.get_balance()))
+        await ctx.send(
+            MSG_PLOT_PLANT.format(
+                ctx.author, _plant,
+                plant_count, total_price/10000,
+                _account.get_balance()
+            )
+        )
 
     @commands.command(aliases=["sh"])
     async def showharvests(self, ctx):
