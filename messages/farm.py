@@ -1,3 +1,7 @@
+MSG_DISCARD_SINGLE = "**{0.mention}, `Plot #{1[0]:04d}` has been scrapped.**"
+MSG_DISCARD_RANGE = "**{0.mention}, `Plot #{1[0]:04d}` to `Plot #{1[1]:04d}` have been scrapped.**"
+MSG_DISCARD_ALL = "**{0.mention}, all your plots have been scrapped.**"
+MSG_DISCARD_OUT_OF_RANGE = "**{0.mention}, the numbers you have chosen are not in the range of all your plots.**"
 MSG_FARM_RENAME_NAME_TOO_LONG = "**{0.mention}, a farm's name can only be 32 characters long.**"
 MSG_FARM_RENAME_SUCCESS = "{0.mention}, you successfully named your farm **{1}**. You now only have **💵 {2:.2f} gil**"
 MSG_FARM_STATUS = """{0.mention}'s farm: **{1.name}**

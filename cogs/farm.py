@@ -6,6 +6,7 @@ from discord.ext import commands
 
 from config import FARM_NAME_CHANGE_PRICE
 from messages.farm import *
+from messages.core import MSG_CMD_INVALID
 from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
@@ -165,6 +166,58 @@ class Farm(commands.Cog):
         self.bot.db_session.add(_plot)
         await ctx.send("**{0.mention}'s plots have been purged.**".format(target))
     
+    @commands.command(aliases=["tp"])
+    async def trashplots(self, ctx, scrap_range=None):
+        """Discard the plants on your plots. No refunds.
+        Scrap range can be:
+        - a number, to scrap that single plot
+        - a range (1-4, 5-7, etc.) with NO SPACES to scrap those plots, the numbers included
+        You can also choose to leave the scrap_range blank, to scrap ALL your plots.
+        """
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        plot_count = len(_farm.plots)
+
+        all_plots = False
+
+        if scrap_range is not None:
+            try:
+                scrap_range = list(map(int, scrap_range.split('-')))  
+            except ValueError:
+                await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+                return
+        else:
+            all_plots = True
+            scrap_range = [1, plot_count]
+        
+        # Command validation:
+        if len(scrap_range) > 2:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        
+        if len(scrap_range) == 1:
+            scrap_range.append(scrap_range[0])
+
+        if scrap_range[1] < scrap_range[0]:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        
+        if not (0 <= scrap_range[0]-1 < plot_count) or not (0 <= scrap_range[1]-1 < plot_count):
+            await ctx.send(MSG_DISCARD_OUT_OF_RANGE.format(ctx.author))
+            return
+        
+        for i in range(scrap_range[0]-1, scrap_range[1]):
+            _farm.plots[i].plant = None
+            _farm.plots[i].planted_at = None
+            self.bot.db_session.add(_farm.plots[i])
+        self.bot.db_session.commit()
+
+        if all_plots:
+            await ctx.send(MSG_DISCARD_ALL.format(ctx.author))
+        elif scrap_range[0] == scrap_range[1]:
+            await ctx.send(MSG_DISCARD_SINGLE.format(ctx.author, scrap_range))
+        else:
+            await ctx.send(MSG_DISCARD_RANGE.format(ctx.author, scrap_range))
+    
     @commands.command()
     @commands.is_owner()
     async def reconsolidatestorage(self, ctx):
@@ -286,7 +339,7 @@ class Farm(commands.Cog):
         id_to_plant_name = {_plant.id: _plant.name for _plant in harvestable_plants}
         total_harvests = {_plant.id: 0 for _plant in harvestable_plants}
 
-        if len(harvestable_plots) is 0:
+        if len(harvestable_plots) == 0:
             await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
             return
 
