@@ -24,6 +24,11 @@ $ python3 run.py
 
 ## Changelog
 ### `v0.0.4b`
+- Introduce new plants Wheat, Tomato, and Sugarcane
+- Add new command `s!trashplots` to discard crops planted in your plots.
+    - `s!trashplots` on its own will scrap **ALL your plots**.
+    - `s!trashplots 5` will scrap **Plot #0005 only**.
+    - `s!trashplots 5-13` (no spaces!) will scrap **Plot #0005 to Plot #0013**.
 - `s!showharvests` now sends an Embed.
 ### `v0.0.3b`
 - **The Economy simulation engine has been revamped.** Every time the market refreshes, the demand is also recalculated. At full demand, the current sale price will be at **double**, and at zero demand, the current sale price will be at **half**.
