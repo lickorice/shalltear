@@ -37,8 +37,8 @@ class Farm(commands.Cog):
         embed.add_field(name="Plots", value=numutils.millify(len(_farm.plots)))
         embed.add_field(
             name="Storage", 
-            value="{0.current_harvest}/{1}".format(
-                numutils.millify(_farm), numutils.millify(_farm.get_harvest_capacity())
+            value="{0}/{1}".format(
+                numutils.millify(_farm.current_harvest), numutils.millify(_farm.get_harvest_capacity())
             ),
         )
 
@@ -219,7 +219,8 @@ class Farm(commands.Cog):
             embed.add_field(
                 name="**`{0.tag}` - {0.name}**".format(_plant),
                 value=MSG_PLANT_PRICES.format(
-                  _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
+                  [numutils.millify(_plant.current_demand), numutils.millify(_plant.base_demand), _plant.base_harvest], 
+                  bp, sp, get_growing_time_string(_plant.growing_seconds)  
                 ) + 
                 "\nYour price: `{0} gil`".format(numutils.millify(_plant.get_farm_sell_price(_farm))) +
                 "\nYour yield: **{0}** units".format(numutils.millify(_plant.get_farm_yield(_farm))),
@@ -252,7 +253,8 @@ class Farm(commands.Cog):
                 embed.add_field(
                     name="**`{0.tag}` - {0.name}**".format(_plant),
                     value=MSG_PLANT_PRICES.format(
-                    _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
+                    [numutils.millify(_plant.current_demand), numutils.millify(_plant.base_demand), _plant.base_harvest], 
+                    bp, sp, get_growing_time_string(_plant.growing_seconds)  
                     ),
                     inline=False
                 )
