@@ -8,7 +8,7 @@ CURRENT_PLANTS = [
         "base_harvest": 10,
         "buy_price": 50000,
         "base_sell_price": 6000,
-        "randomness_factor": 5000,
+        "randomness_factor": 7500,
         "growing_seconds": 300,
     },
     {
@@ -64,6 +64,33 @@ CURRENT_PLANTS = [
         "base_sell_price": 27500,
         "randomness_factor": 4000,
         "growing_seconds": 1800,
+    },
+    {
+        "name": "Wheat", # 62.5 gil per 5 mins
+        "tag": "WHET",
+        "base_harvest": 50,
+        "buy_price": 1000000,
+        "base_sell_price": 22500,
+        "randomness_factor": 4000,
+        "growing_seconds": 60,
+    },
+    {
+        "name": "Tomato", # 25 gil per 5 mins
+        "tag": "TMTO",
+        "base_harvest": 50,
+        "buy_price": 2000000,
+        "base_sell_price": 50000,
+        "randomness_factor": 2000,
+        "growing_seconds": 600,
+    },
+    {
+        "name": "Sugarcane", # 20 gil per 5 mins
+        "tag": "SGRC",
+        "base_harvest": 100,
+        "buy_price": 10000000,
+        "base_sell_price": 300000,
+        "randomness_factor": 2000,
+        "growing_seconds": 28800,
     },
 ]
 

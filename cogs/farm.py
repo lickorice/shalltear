@@ -112,7 +112,7 @@ class Farm(commands.Cog):
         result = _farm.get_next_plot_price()
         await ctx.send("{0.mention}, your next plot costs **💵 {1:.2f} gil**.".format(ctx.author, result))
 
-    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    @commands.cooldown(1, 1, type=commands.BucketType.user)
     @commands.command()
     async def plotbuy(self, ctx):
         """Buy a new plot."""
