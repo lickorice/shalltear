@@ -41,7 +41,7 @@ class Plot(Base):
     def get_status_str(self):
         if self.plant is None:
             return "-- EMPTY --"
-        return "{0} - {1}".format(self.plant.name, self.get_remaining_harvest_time())
+        return "{0} -- {1}".format(self.plant.tag, self.get_remaining_harvest_time())
 
     def is_harvestable(self):
         if self.plant is None: return False
@@ -57,15 +57,20 @@ class Plot(Base):
         result_str = []
         hours, rem = divmod(time_difference.seconds, 3600)
         minutes, seconds = divmod(rem, 60)
+        first_digit = True
         if time_difference.days:
             result_str.append("{}d".format(time_difference.days))
-        if hours:
+            first_digit = False
+        if not first_digit or hours:
             result_str.append("{}h".format(hours))
-        if minutes:
+            first_digit = False
+        if not first_digit or  minutes:
             result_str.append("{}m".format(minutes))
-        if seconds:
+            first_digit = False
+        if not first_digit or  seconds:
             result_str.append("{}s".format(seconds))
-        return "Ready in [{}]".format(', '.join(result_str))
+            first_digit = False
+        return "Fully grown in [{}]".format(', '.join(result_str))
 
     def get_harvest(self, session):
         new_harvest = Harvest(

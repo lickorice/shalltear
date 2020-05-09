@@ -10,11 +10,7 @@ MSG_INSUFFICIENT_FUNDS_EXTRA = "{0.mention}, you do not have enough gil. This op
 MSG_PLANT_NOT_FOUND = "**{0.mention}, that plant is not in our database.**"
 MSG_PLANT_PRICES = "`[B: {1:.2f} gil | (Demand: {0.current_demand}/{0.base_demand}) S: {2:.2f} gil]`\nYields **{0.base_harvest}** units per harvest, grows in `{3}`"
 MSG_PLANT_PRICES_FOOTER = "Next market recalculation will be at {0}"
-MSG_PLOTS_STATUS = """**{0.mention}'s Farm:**
-```
-{1}
-```
-"""
+MSG_PLOTS_STATUS = "{0.mention}'s farm, **{1}**:\n```{2}```"
 MSG_PLOT_NOT_FOUND = "**{0.mention}, you have no available plots to plant on.**"
 MSG_PLOT_PLANT = "{0.mention}, you have planted **{1.name}** in {2} of your plots for **💵 {3:.2f} gil**. You now only have **💵 {4:.2f} gil**."
 MSG_SELL_NONE = "{0.mention}, you have no **{1}** to sell."

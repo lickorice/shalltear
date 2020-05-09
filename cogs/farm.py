@@ -22,13 +22,11 @@ class Farm(commands.Cog):
         if target is None:
             target = ctx.author
         _farm = ORMFarm.get_farm(target, self.bot.db_session)
-        if _farm.name is None:
-            _farm.name = "Unnamed Farm"
-            self.bot.db_session.add(_farm)
-            self.bot.db_session.commit()
+        
+        farm_name = _farm.get_name(self.bot.db_session)
 
         embed = discord.Embed(
-            title="{0.name}#{0.discriminator}'s farm, {1}".format(target, _farm.name),
+            title="{0.name}#{0.discriminator}'s farm, {1}".format(target, farm_name),
             color=0xffd700
         )
 
@@ -72,10 +70,9 @@ class Farm(commands.Cog):
         plot_str = ""
         plot_count = 1
         for _plot in _plots:
-            plot_str += "Plot #{}: {}\n".format(plot_count, _plot.get_status_str())
+            plot_str += "Plot #{0:04d}: {1}\n".format(plot_count, _plot.get_status_str())
             plot_count += 1
-        ""
-        await ctx.send(MSG_PLOTS_STATUS.format(ctx.author, plot_str))
+        await ctx.send(MSG_PLOTS_STATUS.format(ctx.author, _farm.name, plot_str))
 
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx):

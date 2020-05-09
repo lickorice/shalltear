@@ -54,6 +54,13 @@ class Farm(Base):
             return Farm.create_farm(user, session)
         return result
 
+    def get_name(self, session):
+        if self.name is None:
+            self.name = "Unnamed Farm"
+            self.bot.db_session.add(self)
+            self.bot.db_session.commit()
+        return self.name
+
     def get_all_plots(self, session):
         return self.plots
 
