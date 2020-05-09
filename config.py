@@ -25,6 +25,7 @@ ACTIVE_OBJECTS = [
     "objects.economy.farm.harvest",
     "objects.economy.farm.plot",
     "objects.economy.farm.plant",
+    "objects.economy.farm.upgrade",
 ]
 
 ACTIVE_SEEDERS = [
