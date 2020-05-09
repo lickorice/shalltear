@@ -569,7 +569,7 @@ class Farm(commands.Cog):
             await ctx.send(MSG_SELL_NONE.format(ctx.author, _plant.name))
             return
         
-        plant_sell_price = _plant.get_sell_price(raw=True)
+        plant_sell_price = _plant.get_farm_sell_price(_farm, raw=True)
         raw_credit = total_amount * plant_sell_price
         _account.add_credit(
             self.bot.db_session, raw_credit,
