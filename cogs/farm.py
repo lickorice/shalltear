@@ -249,7 +249,7 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
-    async def farmharvest(self, ctx):
+    async def farmharvests(self, ctx):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)

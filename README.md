@@ -23,6 +23,8 @@ $ python3 run.py
 ```
 
 ## Changelog
+### `v0.0.4b`
+- `s!showharvests` now sends an Embed.
 ### `v0.0.3b`
 - **The Economy simulation engine has been revamped.** Every time the market refreshes, the demand is also recalculated. At full demand, the current sale price will be at **double**, and at zero demand, the current sale price will be at **half**.
     - For example, if Turnip sells for 0.75 gil, at full demand (freshly refreshed market) it will be sold at **1.50 gil**, however, at zero demand, Turnip will sell for **0.375 gil**.
