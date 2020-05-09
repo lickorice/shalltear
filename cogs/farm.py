@@ -501,7 +501,8 @@ class Farm(commands.Cog):
             await ctx.send(MSG_SELL_NONE.format(ctx.author, _plant.name))
             return
         
-        raw_credit = total_amount * _plant.get_sell_price(raw=True)
+        plant_sell_price = _plant.get_sell_price(raw=True)
+        raw_credit = total_amount * plant_sell_price
         _account.add_credit(
             self.bot.db_session, raw_credit,
             name="S:{0.id}={1}".format(_plant, total_amount),
@@ -512,7 +513,8 @@ class Farm(commands.Cog):
         _farm.decrease_storage(self.bot.db_session, total_amount)
 
         await ctx.send(MSG_SELL_SUCCESS.format(
-            ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()
+            ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance(),
+            plant_sell_price / 10000
         ))
 
 
