@@ -31,6 +31,7 @@ class Farm(commands.Cog):
         )
 
         embed.add_field(name="Plots", value=len(_farm.plots))
+        embed.add_field(name="Storage", value="{0.current_harvest}/{0.harvest_capacity}".format(_farm))
 
         await ctx.send(embed=embed)
 
@@ -249,7 +250,7 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
-    async def farmharvests(self, ctx):
+    async def farmharvest(self, ctx):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)
