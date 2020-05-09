@@ -163,6 +163,21 @@ class Farm(commands.Cog):
     
     @commands.command()
     @commands.is_owner()
+    async def reconsolidatestorage(self, ctx):
+        """(Owner) Manually reconsolidate all farm capacities."""
+        all_farms = ORMFarm.get_all_farms(self.bot.db_session)
+        for _farm in all_farms:
+            harvest_count = 0
+            for _harvest in _farm.harvests:
+                harvest_count += _harvest.amount
+            _farm.current_harvest = harvest_count
+            self.bot.db_session.add(_farm)
+        self.bot.db_session.commit()
+        logging.info("Reconsolidated storages of {} farms.".format(len(all_farms)))
+        await ctx.send("**All farm storages reconsolidated!**")
+    
+    @commands.command()
+    @commands.is_owner()
     async def refreshplantprices(self, ctx):
         """(Owner) Manually refresh the global market prices."""
         all_plants = Plant.get_plants(self.bot.db_session)

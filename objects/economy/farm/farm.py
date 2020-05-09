@@ -32,6 +32,10 @@ class Farm(Base):
     @staticmethod
     def get_farms_count(session):
         return session.query(Farm).count()
+    
+    @staticmethod
+    def get_all_farms(session):
+        return session.query(Farm).all()
 
     @staticmethod
     def create_farm(user, session):
