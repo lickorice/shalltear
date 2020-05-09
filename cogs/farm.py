@@ -121,8 +121,8 @@ class Farm(commands.Cog):
                 return
             _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
             upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
-            await ctx.send("The next **{0}** upgrade costs **💵 {1:.2f}** gil.".format(
-                upgrade_name.capitalize(), upgrade_cost
+            await ctx.send("{0.mention}, your next **{1}** upgrade costs **💵 {2:.2f}** gil.".format(
+                ctx.author, upgrade_name.capitalize(), upgrade_cost
             ))
 
     @commands.command(aliases=["ubuy"])
@@ -151,8 +151,8 @@ class Farm(commands.Cog):
             name="U:{}".format(upgrade_name), raw=True
         )
         
-        await ctx.send("You bought a **{0} upgrade** for **💵 {2:.2f}** gil. You now only have **💵 {1:.2f}** gil.".format(
-            upgrade_name, _account.get_balance(), upgrade_cost / 10000
+        await ctx.send("{0.mention}, you bought a **{1} upgrade** for **💵 {3:.2f}** gil. You now only have **💵 {2:.2f}** gil.".format(
+            ctx.author, upgrade_name, _account.get_balance(), upgrade_cost / 10000
         ))
 
     @commands.command(aliases=["fp"])
