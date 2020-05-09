@@ -5,7 +5,7 @@ from math import log10
 import discord, schedule
 from discord.ext import commands
 
-from config import FARM_NAME_CHANGE_PRICE
+from config import *
 from messages.farm import *
 from messages.core import MSG_CMD_INVALID
 from objects.economy.account import EconomyAccount
@@ -35,8 +35,12 @@ class Farm(commands.Cog):
         embed.add_field(name="Plots", value=len(_farm.plots))
         embed.add_field(
             name="Storage", 
-            value="{0.current_harvest}/{0.harvest_capacity}".format(_farm)
+            value="{0.current_harvest}/{0.harvest_capacity}".format(_farm),
         )
+
+        for _upgrade in _farm.upgrades:
+            val = _upgrade.level
+            embed.add_field(name=_upgrade.name.capitalize(), value=val)
 
         await ctx.send(embed=embed)
 
@@ -88,6 +92,47 @@ class Farm(commands.Cog):
             ctx.author, name, _account.get_balance()
         ))
 
+    @commands.command(aliases=["u$"])
+    async def upgradeprice(self, ctx, upgrade_name=None):
+        upgrade_name = upgrade_name.lower()
+        if upgrade_name not in FARM_UPGRADES:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
+        await ctx.send("The next **{0}** upgrade costs **💵 {1:.2f}** gil.".format(
+            upgrade_name, upgrade_cost / 10000
+        ))
+
+    @commands.command(aliases=["ubuy"])
+    async def upgradebuy(self, ctx, upgrade_name=None):
+        if upgrade_name is None:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        upgrade_name = upgrade_name.lower()
+        if upgrade_name not in FARM_UPGRADES:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+
+        upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
+
+        if not _account.has_balance(upgrade_cost, raw=True):
+            await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
+                ctx.author, _account.get_balance(), upgrade_cost
+            ))
+            return
+        
+        _farm.upgrade(self.bot.db_session, upgrade_name)
+        _account.add_debit(self.bot.db_session, upgrade_cost,
+            name="U:{}".format(upgrade_name), raw=True
+        )
+        
+        await ctx.send("You bought a **{0} upgrade** for **💵 {2:.2f}** gil. You now only have **💵 {1:.2f}** gil.".format(
+            upgrade_name, _account.get_balance(), upgrade_cost / 10000
+        ))
+
     @commands.command(aliases=["fp"])
     async def farmplots(self, ctx, page_number: int=1):
         """Show the details of your plots."""
@@ -123,12 +168,6 @@ class Farm(commands.Cog):
         embed.set_footer(text="Showing 20 plots per page. s!fp [page_number]")
 
         await ctx.send(embed=embed)
-
-        # await ctx.send(MSG_PLOTS_STATUS.format(
-        #     ctx.author, _farm.name, 
-        #     plot_str, 
-        #     page_number, len(paginated_plots)
-        # ))
 
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx, plant_name=None):
