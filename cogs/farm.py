@@ -222,7 +222,7 @@ class Farm(commands.Cog):
 
         id_to_plant_name = {_plant.id: _plant.name for _plant in harvested_plants}
         total_harvests = {_plant.id: 0 for _plant in harvested_plants}
-        
+
         if len(_farm.harvests) == 0:
             await ctx.send(MSG_SHOW_HARVESTS_NONE.format(ctx.author))
             return
@@ -232,13 +232,21 @@ class Farm(commands.Cog):
 
         harvest_str = ""
 
+        embed = discord.Embed(
+            title="{0.name}#{0.discriminator}'s Harvests".format(ctx.author),
+            color=0xffd700
+        )
+
         for harvest in total_harvests:
             harvest_str += "**{0}**, {1} units\n".format(
                 id_to_plant_name[harvest],
                 total_harvests[harvest]
             )
+
+        embed.add_field(name="Crops", value=harvest_str, inline=False)
         
-        await ctx.send(MSG_SHOW_HARVESTS.format(ctx.author, harvest_str))
+        # await ctx.send(MSG_SHOW_HARVESTS.format(ctx.author, harvest_str))
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
     async def farmharvest(self, ctx):
