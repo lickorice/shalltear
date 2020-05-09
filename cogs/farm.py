@@ -67,17 +67,46 @@ class Farm(commands.Cog):
         ))
 
     @commands.command(aliases=["fp"])
-    async def farmplots(self, ctx):
+    async def farmplots(self, ctx, page_number: int=1):
         """Show the details of your plots."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_all_plots(self.bot.db_session)
+
+        plot_count = len(_plots)
+
+        paginated_plots = [
+            _plots[i:i+20] for i in range(0, plot_count, 20)
+        ]
+
+        # Make sure page number is in bounds
+        page_number = min(page_number, plot_count)
+        page_number = max(page_number, 1)
         
         plot_str = ""
-        plot_count = 1
-        for _plot in _plots:
+        plot_count = 1 + (20 * (page_number-1))
+        for _plot in paginated_plots[page_number-1]:
             plot_str += "Plot #{0:04d}: {1}\n".format(plot_count, _plot.get_status_str())
             plot_count += 1
-        await ctx.send(MSG_PLOTS_STATUS.format(ctx.author, _farm.name, plot_str))
+        
+        embed = discord.Embed(
+            title="{0.name}#{0.discriminator}'s farm, {1}".format(ctx.author, _farm.name),
+            color=0xffd700
+        )
+
+        embed.add_field(
+            name=MSG_PLOTS_STATUS.format(page_number, len(paginated_plots)),
+            value="```{}```".format(plot_str)
+        )
+
+        embed.set_footer(text="Showing 20 plots per page.")
+
+        await ctx.send(embed=embed)
+
+        # await ctx.send(MSG_PLOTS_STATUS.format(
+        #     ctx.author, _farm.name, 
+        #     plot_str, 
+        #     page_number, len(paginated_plots)
+        # ))
 
     @commands.command(aliases=["p$",])
     async def plantprices(self, ctx):

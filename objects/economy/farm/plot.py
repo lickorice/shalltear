@@ -70,7 +70,7 @@ class Plot(Base):
         if not first_digit or  seconds:
             result_str.append("{}s".format(seconds))
             first_digit = False
-        return "Fully grown in [{}]".format(', '.join(result_str))
+        return "[{}]".format(', '.join(result_str))
 
     def harvest(self, session, commit_on_execution=True):
         if not self.is_harvestable():

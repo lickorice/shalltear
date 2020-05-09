@@ -9,7 +9,7 @@ MSG_FARM_STATUS = """{0.mention}'s farm: **{1.name}**
 Plot count: {2}
 ```
 """
-MSG_HARVEST_NOT_ENOUGH_CAPACITY = "{0.mention}, you do not have enough storage. You only have **{1}** available storage space for crops. You are trying to harvest a total of **{2}** units of crops."
+MSG_HARVEST_NOT_ENOUGH_CAPACITY = "{0.mention}, you do not have enough storage. You only have **{1}** available storage space for crops. You are trying to harvest a total of **{2}** units of crops. You can use `s!silobuy` to upgrade your storage, "
 MSG_HARVEST_NONE = "{0.mention}, you have no harvestable crops."
 MSG_HARVEST_SUCCESS = "{0.mention}, you have successfully harvested your plots:\n{1}"
 MSG_INSUFFICIENT_FUNDS = "{0.mention}, you do not have enough gil. You only have **💵 {1:.2f} gil**"
@@ -18,7 +18,8 @@ MSG_PLANT_NOT_FOUND = "**{0.mention}, that plant is not in our database.**"
 MSG_PLANT_NO_PLOTS = "**{0.mention}, you do not have enough available plots for that.** You only have **{1}** available and you're trying to plant on **{2}**."
 MSG_PLANT_PRICES = "`[B: {1:.2f} gil | (Demand: {0.current_demand}/{0.base_demand}) S: {2:.2f} gil]`\nYields **{0.base_harvest}** units per harvest, grows in `{3}`"
 MSG_PLANT_PRICES_FOOTER = "Next market recalculation will be at {0}"
-MSG_PLOTS_STATUS = "{0.mention}'s farm, **{1}**:\n```{2}```"
+MSG_PLOTS_STATUS = "Showing page **{0} of {1}**:\n"
+# MSG_PLOTS_STATUS = "{0.mention}'s farm, **{1}**\nDisplaying 20 plots per page. Showing page **{3} of {4}**:\n```{2}```"
 MSG_PLOT_NOT_FOUND = "**{0.mention}, you have no available plots to plant on.**"
 MSG_PLOT_PLANT = "{0.mention}, you have planted **{1.name}** in {2} of your plots for **💵 {3:.2f} gil**. You now only have **💵 {4:.2f} gil**."
 MSG_PLOT_PRICE_CHECK = "{0.mention}, your next plot costs **💵 {1:.2f} gil**."
