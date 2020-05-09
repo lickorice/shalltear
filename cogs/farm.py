@@ -35,7 +35,9 @@ class Farm(commands.Cog):
         embed.add_field(name="Plots", value=len(_farm.plots))
         embed.add_field(
             name="Storage", 
-            value="{0.current_harvest}/{0.harvest_capacity}".format(_farm),
+            value="{0.current_harvest}/{1}".format(
+                _farm, _farm.get_harvest_capacity()
+            ),
         )
 
         embed.add_field(name="Harvest Multiplier", value="{0:.6f}x".format(_farm.get_harvest_multiplier()), inline=False)
@@ -504,7 +506,7 @@ class Farm(commands.Cog):
         if not _farm.has_storage(storage_needed):
             await ctx.send(MSG_HARVEST_NOT_ENOUGH_CAPACITY.format(
                 ctx.author,
-                max(_farm.harvest_capacity - _farm.current_harvest, 0),
+                max(_farm.get_harvest_capacity() - _farm.current_harvest, 0),
                 storage_needed
             ))
             return
