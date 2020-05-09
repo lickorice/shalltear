@@ -129,6 +129,27 @@ class Farm(commands.Cog):
         else:
             await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
+    @commands.command(aliases=["silo$",])
+    async def siloprice(self, ctx):
+        """Show the price of the next silo (storage upgrade)."""
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        result = _farm.get_next_storage_upgrade_price()
+        await ctx.send(MSG_SILO_PRICE_CHECK.format(ctx.author, result))
+
+    @commands.cooldown(1, 1, type=commands.BucketType.user)
+    @commands.command()
+    async def silobuy(self, ctx):
+        """Buy a new silo (increases your storage by 100)."""
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        price = _farm.get_next_storage_upgrade_price(raw=True)
+        if _account.has_balance(price, raw=True):
+            _farm.upgrade_storage(self.bot.db_session)
+            _account.add_debit(self.bot.db_session, price, name="SILOBUY", raw=True)
+            await ctx.send(MSG_SILO_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
+        else:
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
+
     @commands.command()
     @commands.is_owner()
     async def setplanttag(self, ctx, plant_name, tag):
@@ -362,7 +383,7 @@ class Farm(commands.Cog):
         storage_needed = 0
         for i in range(harvest_range[0]-1, harvest_range[1]):
             storage_needed += _farm.plots[i].get_harvest_amount()
-        
+
         if not _farm.has_storage(storage_needed):
             await ctx.send(MSG_HARVEST_NOT_ENOUGH_CAPACITY.format(
                 ctx.author,

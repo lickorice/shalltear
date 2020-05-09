@@ -4,7 +4,7 @@ import logging
 from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
 
-from config import BASE_PLOT_PRICE, PLOT_PRICE_FACTOR
+from config import *
 from objects.base import Base
 from objects.economy.farm.plot import Plot
 
@@ -82,11 +82,23 @@ class Farm(Base):
             return plot_price / 10000
         return plot_price
 
+    def get_next_storage_upgrade_price(self, raw=False):
+        silo_count = int( self.harvest_capacity / 100 )
+        silo_price = int( BASE_STORAGE_UPGRADE_PRICE * (silo_count ** STORAGE_UPGRADE_PRICE_FACTOR) )
+        if not raw:
+            return silo_price / 10000
+        return silo_price
+
     def has_storage(self, amount):
         return (self.current_harvest + amount <= self.harvest_capacity)
 
     def decrease_storage(self, session, amount):
         self.current_harvest = max(self.current_harvest - amount, 0)
+        session.add(self)
+        session.commit()
+
+    def upgrade_storage(self, session):
+        self.harvest_capacity += 100
         session.add(self)
         session.commit()
 
