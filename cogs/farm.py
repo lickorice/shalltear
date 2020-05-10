@@ -5,7 +5,7 @@ from math import log10
 import discord, schedule
 from discord.ext import commands
 
-from config import FARM_NAME_CHANGE_PRICE
+from config import FARM_NAME_CHANGE_PRICE, FARM_PLOTS_MAX
 from messages.farm import *
 from messages.core import MSG_CMD_INVALID
 from objects.economy.account import EconomyAccount
@@ -32,10 +32,12 @@ class Farm(commands.Cog):
             color=0xffd700
         )
 
-        embed.add_field(name="Plots", value=len(_farm.plots))
+        embed.add_field(name="Plots", value="{0} / {1}".format(
+            len(_farm.plots), FARM_PLOTS_MAX
+        ))
         embed.add_field(
             name="Storage", 
-            value="{0.current_harvest}/{0.harvest_capacity}".format(_farm)
+            value="{0.current_harvest} / {0.harvest_capacity}".format(_farm)
         )
 
         await ctx.send(embed=embed)
@@ -207,6 +209,15 @@ class Farm(commands.Cog):
         up_count = max(1, up_count)
         up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        
+        plot_count = _farm.get_plot_count()
+        to_max_plots = FARM_PLOTS_MAX - plot_count
+        if to_max_plots == 0:
+            await ctx.send("**{0.mention}, you have reached maximum plot count.**".format(ctx.author))
+            return
+        
+        up_count = min(up_count, to_max_plots)
+        
         result = _farm.get_next_plot_price(up_count=up_count)
         await ctx.send(MSG_PLOT_PRICE_CHECK.format(
             ctx.author, result, up_count
@@ -220,6 +231,15 @@ class Farm(commands.Cog):
         up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        
+        plot_count = _farm.get_plot_count()
+        to_max_plots = FARM_PLOTS_MAX - plot_count
+        if to_max_plots == 0:
+            await ctx.send("**{0.mention}, you have reached maximum plot count.**".format(ctx.author))
+            return
+        
+        up_count = min(up_count, to_max_plots)
+        
         price = _farm.get_next_plot_price(raw=True, up_count=up_count)
         if _account.has_balance(price, raw=True):
             _farm.add_plot(self.bot.db_session, up_count=up_count)

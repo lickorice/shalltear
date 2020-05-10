@@ -84,8 +84,12 @@ class Farm(Base):
     def get_next_plot_price(self, raw=False, up_count=1):
         plot_count = self.get_plot_count() - 2
         plot_price = 0
-        for i in range(0, up_count):
-            plot_price += int( BASE_PLOT_PRICE * ((plot_count+i) ** PLOT_PRICE_FACTOR) )
+        to_max_plots = FARM_PLOTS_MAX - plot_count
+        if to_max_plots == 0:
+            return 0
+        up_count = min(up_count, to_max_plots)
+        for i in range(plot_count, plot_count+up_count):
+            plot_price += int( BASE_PLOT_PRICE * (i ** PLOT_PRICE_FACTOR) )
         if not raw:
             return plot_price / 10000
         return plot_price
