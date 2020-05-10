@@ -23,16 +23,6 @@ $ python3 run.py
 ```
 
 ## Changelog
-### `v0.0.5b`
-- **Introduce a new upgrades system.** Different upgrades can increase crop output, improve crop prices, and expand storage. Upgrades of the same name improve additively, and of the different name multiplicatively.
-    - For example, Take a **Farmers** upgrades and **Tractors** upgrades improve crop harvest by **5%**.
-        - 2 Farmers upgrades improve crop harvest by **0.05 + 0.05 = 1.10x**
-        - An upgrade of each improve crop harvest by **1.05 * 1.05 = 1.1025x**
-    - Note that results of upgrades are always **rounded down.**
-        - Pumpkins, which yield 3 units each, if improved by 15%, would yield 3.45 units. However, this is rounded down, and would **instead yield just 3 units**.
-- Add command `s!upgradeprice [s!u$] <upgrade_name>` to check upgrade prices.
-- Add command `s!upgradebuy [s!ubuy] <upgrade_name>` tp purchase an upgrade.
-- Add checking of specific plant prices. `s!plantprices <plant_name>`
 ### `v0.0.4b`
 - Introduce new plants Wheat, Tomato, Sugarcane, and Coconut.
 - **Introduce a new crop storage system.** All farms will start with 100 storage, and each new storage upgrade will add an additional 100 storage to your farm. Storage upgrade prices scale (much like plot prices, but are more forgiving) as you purchase new upgrades.

@@ -36,19 +36,19 @@ TRANSFER_TAX = 0.01
 FARM_UPGRADES = {
     "farmers":
     {
-        "type": "harvests",
+        "type": "production",
         "upgrades": 0.05,
         "base": 1000000, "factor": 1.25
     },
     "tractors":
     {
-        "type": "harvests",
+        "type": "production",
         "upgrades": 0.05,
         "base": 10000000, "factor": 1.25
     },
     "cropdusters":
     {
-        "type": "harvests",
+        "type": "production",
         "upgrades": 0.05,
         "base": 100000000, "factor": 1.25
     },
@@ -61,18 +61,6 @@ FARM_UPGRADES = {
     "businessmen":
     {
         "type": "prices",
-        "upgrades": 0.05,
-        "base": 100000000, "factor": 1.25
-    },
-    "crates":
-    {
-        "type": "storage",
-        "upgrades": 0.05,
-        "base": 1000000, "factor": 1.25
-    },
-    "pallets":
-    {
-        "type": "storage",
         "upgrades": 0.05,
         "base": 100000000, "factor": 1.25
     },

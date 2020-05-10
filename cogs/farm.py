@@ -38,10 +38,6 @@ class Farm(commands.Cog):
             value="{0.current_harvest}/{0.harvest_capacity}".format(_farm),
         )
 
-        embed.add_field(name="Harvest Multiplier", value="{0:.6f}x".format(_farm.get_harvest_multiplier()), inline=False)
-        embed.add_field(name="Prices Multiplier", value="{0:.6f}x".format(_farm.get_price_multiplier()), inline=False)
-        embed.add_field(name="Storage Multiplier", value="{0:.6f}x".format(_farm.get_storage_multiplier()), inline=False)
-
         for _upgrade in _farm.upgrades:
             val = _upgrade.level
             embed.add_field(name=_upgrade.name.capitalize(), value=val)
@@ -97,7 +93,7 @@ class Farm(commands.Cog):
         ))
 
     @commands.command(aliases=["u$"])
-    async def upgradeprice(self, ctx, upgrade_name):
+    async def upgradeprice(self, ctx, upgrade_name=None):
         upgrade_name = upgrade_name.lower()
         if upgrade_name not in FARM_UPGRADES:
             await ctx.send(MSG_CMD_INVALID.format(ctx.author))
@@ -105,7 +101,7 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
         await ctx.send("The next **{0}** upgrade costs **💵 {1:.2f}** gil.".format(
-            upgrade_name, upgrade_cost
+            upgrade_name, upgrade_cost / 10000
         ))
 
     @commands.command(aliases=["ubuy"])
@@ -120,7 +116,7 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
 
-        upgrade_cost = _farm.get_upgrade_cost(upgrade_name, raw=True)
+        upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
 
         if not _account.has_balance(upgrade_cost, raw=True):
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
@@ -179,10 +175,9 @@ class Farm(commands.Cog):
         all_plants = Plant.get_plants(self.bot.db_session)
         if plant_name is not None:
             _plant = Plant.get_plant(self.bot.db_session, plant_name)
-            _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
             
             if _plant is None:
-                await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+                ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
                 return
 
             embed = discord.Embed(
@@ -195,9 +190,7 @@ class Farm(commands.Cog):
                 name="**`{0.tag}` - {0.name}**".format(_plant),
                 value=MSG_PLANT_PRICES.format(
                   _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
-                ) + 
-                "\nYour price: `{0:.2f} gil`".format(_plant.get_farm_sell_price(_farm)) +
-                "\nYour yield: **{0}** units".format(_plant.get_farm_yield(_farm)),
+                ),
                 inline=False
             )
         else:

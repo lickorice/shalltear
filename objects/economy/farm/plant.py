@@ -56,14 +56,6 @@ class Plant(Base):
             return sell_price
         return sell_price / 10000
 
-    def get_farm_sell_price(self, _farm, raw=False):
-        raw_sell_price = self.get_sell_price(raw=raw)
-        return raw_sell_price * _farm.get_price_multiplier()
-        
-    def get_farm_yield(self, _farm):
-        raw_yield = self.base_harvest
-        return int(raw_yield * _farm.get_harvest_multiplier())
-
     def decrement_demand(self, session, amount):
         self.current_demand = max(self.current_demand - amount, 0)
         session.add(self)

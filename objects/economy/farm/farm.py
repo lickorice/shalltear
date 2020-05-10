@@ -56,11 +56,9 @@ class Farm(Base):
         ]
         new_farm.upgrades = []
         for UPGRADE in FARM_UPGRADES:
-            new_farm.upgrades.append(Upgrade(
-                name=UPGRADE, 
-                base_price=FARM_UPGRADES[UPGRADE]["base"],
-                upgrade_type=FARM_UPGRADES[UPGRADE]["type"]
-        ))
+            new_farm.upgrades.append(
+                Upgrade(name=UPGRADE, base_price=FARM_UPGRADES[UPGRADE]["base"])
+            )
         session.add(new_farm)
         session.commit()
         return new_farm
@@ -73,24 +71,6 @@ class Farm(Base):
             return Farm.create_farm(user, session)
         return result
 
-    def get_price_multiplier(self):
-        base_factor = 1
-        for _upgrade in self.upgrades.filter(Upgrade.upgrade_type=="prices").all():
-            base_factor *= (1+(0.05*_upgrade.level))
-        return base_factor
-
-    def get_harvest_multiplier(self):
-        base_factor = 1
-        for _upgrade in self.upgrades.filter(Upgrade.upgrade_type=="harvests").all():
-            base_factor *= (1+(0.05*_upgrade.level))
-        return base_factor
-
-    def get_storage_multiplier(self):
-        base_factor = 1
-        for _upgrade in self.upgrades.filter(Upgrade.upgrade_type=="storage").all():
-            base_factor *= (1+(0.05*_upgrade.level))
-        return base_factor
-
     def upgrade(self, session, upgrade_name):
         _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
         _upgrade.level += 1
@@ -102,7 +82,7 @@ class Farm(Base):
         base = _upgrade.base_price
         factor = _upgrade.factor
         level = _upgrade.level
-        if not raw:
+        if raw:
             return (base * ((level+1)**factor)) / 10000
         return base * ((level+1)**factor)
 

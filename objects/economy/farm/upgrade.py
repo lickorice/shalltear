@@ -13,7 +13,6 @@ class Upgrade(Base):
     id = Column(Integer, primary_key=True)
 
     name = Column(String(32))
-    upgrade_type = Column(String(32))
 
     level = Column(Integer, default=0)
     base_price = Column(BigInteger)
