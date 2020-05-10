@@ -113,9 +113,6 @@ class Farm(Base):
             self.bot.db_session.commit()
         return self.name
 
-    def get_harvest_capacity(self):
-        return int(self.harvest_capacity * self.get_storage_multiplier())
-
     def get_all_plots(self, session):
         return self.plots
 
@@ -141,7 +138,7 @@ class Farm(Base):
         return silo_price
 
     def has_storage(self, amount):
-        return (self.current_harvest + amount <= self.get_harvest_capacity())
+        return (self.current_harvest + amount <= self.harvest_capacity)
 
     def decrease_storage(self, session, amount):
         self.current_harvest = max(self.current_harvest - amount, 0)
