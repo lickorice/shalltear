@@ -103,9 +103,9 @@ class Farm(commands.Cog):
     @commands.command(aliases=["u$"])
     @commands.cooldown(1, 5, type=commands.BucketType.user)
     async def upgradeprice(self, ctx, upgrade_name=None, up_count: int=1):
-        """Check upgrade prices. You can specify an upgrade count <= 100."""
+        """Check upgrade prices. You can specify an upgrade count <= 1M."""
         up_count = max(1, up_count)
-        up_count = min(100, up_count)
+        up_count = min(1000000, up_count)
         if upgrade_name is None:
             embed = discord.Embed(
                 title="{0.name}#{0.discriminator}'s Upgrade Prices".format(ctx.author),
@@ -131,10 +131,10 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["ubuy"])
     @commands.cooldown(1, 5, type=commands.BucketType.user)
-    async def upgradebuy(self, ctx, upgrade_name=None, up_count=1):
-        """Buy an upgrade."""
+    async def upgradebuy(self, ctx, upgrade_name=None, up_count: int=1):
+        """Buy an upgrade (up to 1M upgrades)."""
         up_count = max(1, up_count)
-        up_count = min(100, up_count)
+        up_count = min(1000000, up_count)
         if upgrade_name is None:
             await ctx.send(MSG_CMD_INVALID.format(ctx.author))
             return
@@ -275,25 +275,36 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["plot$",])
-    async def plotprice(self, ctx):
-        """Show the price of the next plot."""
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def plotprice(self, ctx, up_count: int=1):
+        """Show the price of the next N plots. (N <= 1M)"""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        result = _farm.get_next_plot_price()
+        result = _farm.get_next_plot_price(up_count=up_count)
         await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, numutils.millify(result, is_money=True)))
 
-    @commands.cooldown(1, 1, type=commands.BucketType.user)
     @commands.command()
-    async def plotbuy(self, ctx):
-        """Buy a new plot."""
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def plotbuy(self, ctx, up_count: int=1):
+        """Buy new N plots. (N <= 1M)"""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
-        price = _farm.get_next_plot_price(raw=True)
+        price = _farm.get_next_plot_price(raw=True, up_count=up_count)
         if _account.has_balance(price, raw=True):
-            _farm.add_plot(self.bot.db_session)
+            _farm.add_plot(self.bot.db_session, up_count=up_count)
             _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
-            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(ctx.author, numutils.millify(_account.get_balance(), is_money=True)))
+            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(
+                ctx.author, numutils.millify(_account.get_balance(), is_money=True),
+                up_count
+            ))
         else:
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, numutils.millify(_account.get_balance(), is_money=True)))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
+                ctx.author, numutils.millify(_account.get_balance(), is_money=True),
+                numutils.millify(price / 10000, is_money=True)
+            ))
 
     @commands.command(aliases=["silo$",])
     async def siloprice(self, ctx):
