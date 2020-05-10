@@ -130,9 +130,11 @@ class Farm(Base):
             return plot_price / 10000
         return plot_price
 
-    def get_next_storage_upgrade_price(self, raw=False):
+    def get_next_storage_upgrade_price(self, raw=False, up_count=1):
         silo_count = int( self.harvest_capacity / 100 )
-        silo_price = int( BASE_STORAGE_UPGRADE_PRICE * (silo_count ** STORAGE_UPGRADE_PRICE_FACTOR) )
+        silo_price = 0
+        for i in range(up_count):
+            silo_price += int( BASE_STORAGE_UPGRADE_PRICE * ((silo_count+i) ** STORAGE_UPGRADE_PRICE_FACTOR) )
         if not raw:
             return silo_price / 10000
         return silo_price
@@ -145,8 +147,8 @@ class Farm(Base):
         session.add(self)
         session.commit()
 
-    def upgrade_storage(self, session):
-        self.harvest_capacity += 100
+    def upgrade_storage(self, session, up_count=1):
+        self.harvest_capacity += (100*up_count)
         session.add(self)
         session.commit()
 

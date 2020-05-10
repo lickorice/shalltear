@@ -28,4 +28,4 @@ MSG_SELL_SUCCESS = "{0.mention}, you sold **{1} units** of **{2.name}** at `{5} 
 MSG_SHOW_HARVESTS_NONE = "{0.mention}, you have no harvested crops."
 MSG_SHOW_HARVESTS = "{0.mention}, your current unsold harvests are:\n{1}"
 MSG_SILO_PRICE_CHECK = "{0.mention}, your next silo costs **💵 {1} gil**. Each new silo upgrades your crop storage by 100."
-MSG_SILO_BUY_SUCCESS = "{0.mention}, you have successfully bought a new silo! Your new balance is now **💵 {1} gil**."
+MSG_SILO_BUY_SUCCESS = "{0.mention}, you have successfully bought **{2}** silos! Your new balance is now **💵 {1} gil**."
