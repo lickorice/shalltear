@@ -27,8 +27,8 @@ class Plant(Base):
 
     growing_seconds = Column(BigInteger)
 
-    current_demand = Column(BigInteger)
-    base_demand = Column(BigInteger)
+    current_demand = Column(BigInteger, default=1)
+    base_demand = Column(BigInteger, default=1)
     current_demand_factor = Column(BigInteger, default=40000)
 
     created_at = Column(DateTime, default=datetime.now)

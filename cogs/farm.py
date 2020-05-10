@@ -201,46 +201,68 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["plot$",])
-    async def plotprice(self, ctx):
-        """Show the price of the next plot."""
-        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        result = _farm.get_next_plot_price()
-        await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, result))
-
     @commands.cooldown(1, 1, type=commands.BucketType.user)
+    async def plotprice(self, ctx, up_count: int=1):
+        """Show the price of the next N plots. (N <= 1M)"""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        result = _farm.get_next_plot_price(up_count=up_count)
+        await ctx.send(MSG_PLOT_PRICE_CHECK.format(
+            ctx.author, result, up_count
+        ))
+
     @commands.command()
-    async def plotbuy(self, ctx):
-        """Buy a new plot."""
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def plotbuy(self, ctx, up_count: int=1):
+        """Buy new N plots. (N <= 1M)"""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
-        price = _farm.get_next_plot_price(raw=True)
+        price = _farm.get_next_plot_price(raw=True, up_count=up_count)
         if _account.has_balance(price, raw=True):
-            _farm.add_plot(self.bot.db_session)
+            _farm.add_plot(self.bot.db_session, up_count=up_count)
             _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
-            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
+            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(
+                ctx.author, _account.get_balance(), up_count
+            ))
         else:
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
+                ctx.author, _account.get_balance(), price / 10000
+            ))
 
     @commands.command(aliases=["silo$",])
-    async def siloprice(self, ctx):
-        """Show the price of the next silo (storage upgrade)."""
-        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        result = _farm.get_next_storage_upgrade_price()
-        await ctx.send(MSG_SILO_PRICE_CHECK.format(ctx.author, result))
-
     @commands.cooldown(1, 1, type=commands.BucketType.user)
+    async def siloprice(self, ctx, up_count: int=1):
+        """Show the price of up to the next 1M silos (storage upgrade)."""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        result = _farm.get_next_storage_upgrade_price(up_count=up_count)
+        await ctx.send(MSG_SILO_PRICE_CHECK.format(
+            ctx.author, result, up_count
+        ))
+
     @commands.command()
-    async def silobuy(self, ctx):
-        """Buy a new silo (increases your storage by 100)."""
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def silobuy(self, ctx, up_count: int=1):
+        """Buy new N silos (increases your storage by 100). (N <= 1M)"""
+        up_count = max(1, up_count)
+        up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
-        price = _farm.get_next_storage_upgrade_price(raw=True)
+        price = _farm.get_next_storage_upgrade_price(raw=True, up_count=up_count)
         if _account.has_balance(price, raw=True):
-            _farm.upgrade_storage(self.bot.db_session)
+            _farm.upgrade_storage(self.bot.db_session, up_count)
             _account.add_debit(self.bot.db_session, price, name="SILOBUY", raw=True)
-            await ctx.send(MSG_SILO_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
+            await ctx.send(MSG_SILO_BUY_SUCCESS.format(
+                ctx.author, _account.get_balance(), up_count
+            ))
         else:
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
+                ctx.author, _account.get_balance(), price / 10000
+            ))
 
     @commands.command()
     @commands.is_owner()

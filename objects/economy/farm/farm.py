@@ -81,16 +81,20 @@ class Farm(Base):
     def get_plot_count(self):
         return len(self.plots)
 
-    def get_next_plot_price(self, raw=False):
+    def get_next_plot_price(self, raw=False, up_count=1):
         plot_count = self.get_plot_count() - 2
-        plot_price = int( BASE_PLOT_PRICE * (plot_count ** PLOT_PRICE_FACTOR) )
+        plot_price = 0
+        for i in range(0, up_count):
+            plot_price += int( BASE_PLOT_PRICE * ((plot_count+i) ** PLOT_PRICE_FACTOR) )
         if not raw:
             return plot_price / 10000
         return plot_price
 
-    def get_next_storage_upgrade_price(self, raw=False):
+    def get_next_storage_upgrade_price(self, raw=False, up_count=1):
         silo_count = int( self.harvest_capacity / 100 )
-        silo_price = int( BASE_STORAGE_UPGRADE_PRICE * (silo_count ** STORAGE_UPGRADE_PRICE_FACTOR) )
+        silo_price = 0
+        for i in range(up_count):
+            silo_price += int( BASE_STORAGE_UPGRADE_PRICE * ((silo_count+i) ** STORAGE_UPGRADE_PRICE_FACTOR) )
         if not raw:
             return silo_price / 10000
         return silo_price
@@ -103,12 +107,12 @@ class Farm(Base):
         session.add(self)
         session.commit()
 
-    def upgrade_storage(self, session):
-        self.harvest_capacity += 100
+    def upgrade_storage(self, session, up_count=1):
+        self.harvest_capacity += 100 * (up_count)
         session.add(self)
         session.commit()
 
-    def add_plot(self, session):
-        self.plots.append(Plot())
+    def add_plot(self, session, up_count=1):
+        self.plots += [Plot() for i in range(up_count)]
         session.add(self)
         session.commit()
