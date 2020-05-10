@@ -13,7 +13,6 @@ from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
 from objects.economy.farm.upgrade import Upgrade
-import utils.numbers as numutils
 
 
 class Farm(commands.Cog):
@@ -34,11 +33,11 @@ class Farm(commands.Cog):
             color=0xffd700
         )
 
-        embed.add_field(name="Plots", value=numutils.millify(len(_farm.plots)))
+        embed.add_field(name="Plots", value=len(_farm.plots))
         embed.add_field(
             name="Storage", 
             value="{0.current_harvest}/{1}".format(
-                numutils.millify(_farm), numutils.millify(_farm.get_harvest_capacity())
+                _farm, _farm.get_harvest_capacity()
             ),
         )
 
@@ -67,7 +66,7 @@ class Farm(commands.Cog):
                 row_name = "#{1} **{2}** - ({0.name}#{0.discriminator})".format(user, rank, _farm.get_name(self.bot.db_session))
             except AttributeError:
                 row_name = "#{1} **{2}** - ({0})".format("Unknown User", rank, _farm.get_name(self.bot.db_session))
-            plot_count = "🌱"*leaf_count + " {0} Plots".format(numutils.millify(len(_farm.plots)))
+            plot_count = "🌱"*leaf_count + " {0} Plots".format(len(_farm.plots))
             embed.add_field(name=row_name, value=plot_count, inline=False)
             rank += 1
 
@@ -84,7 +83,7 @@ class Farm(commands.Cog):
 
         if not _account.has_balance(FARM_NAME_CHANGE_PRICE, raw=True):
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
-                ctx.author, numutils.millify(_account.get_balance()), FARM_NAME_CHANGE_PRICE / 10000
+                ctx.author, _account.get_balance(), FARM_NAME_CHANGE_PRICE / 10000
             ))
             return
 
@@ -97,7 +96,7 @@ class Farm(commands.Cog):
         self.bot.db_session.commit()
         
         await ctx.send(MSG_FARM_RENAME_SUCCESS.format(
-            ctx.author, name, numutils.millify(_account.get_balance())
+            ctx.author, name, _account.get_balance()
         ))
 
     @commands.command(aliases=["u$"])
@@ -112,7 +111,7 @@ class Farm(commands.Cog):
             for _upgrade in _farm.upgrades:
                 embed.add_field(
                     name=_upgrade.name.capitalize(),
-                    value="`{0} gil`".format(numutils.millify(_upgrade.get_next_level_cost(raw=False)))
+                    value="`{0:.2f} gil`".format(_upgrade.get_next_level_cost(raw=False))
                 )
             await ctx.send(embed=embed)
         else:
@@ -122,8 +121,8 @@ class Farm(commands.Cog):
                 return
             _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
             upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
-            await ctx.send("{0.mention}, your next **{1}** upgrade costs **💵 {2}** gil.".format(
-                ctx.author, upgrade_name.capitalize(), numutils.millify(upgrade_cost)
+            await ctx.send("{0.mention}, your next **{1}** upgrade costs **💵 {2:.2f}** gil.".format(
+                ctx.author, upgrade_name.capitalize(), upgrade_cost
             ))
 
     @commands.command(aliases=["ubuy"])
@@ -143,7 +142,7 @@ class Farm(commands.Cog):
 
         if not _account.has_balance(upgrade_cost, raw=True):
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
-                ctx.author, numutils.millify(_account.get_balance()), numutils.millify(upgrade_cost / 10000)
+                ctx.author, _account.get_balance(), upgrade_cost
             ))
             return
         
@@ -152,8 +151,8 @@ class Farm(commands.Cog):
             name="U:{}".format(upgrade_name), raw=True
         )
         
-        await ctx.send("{0.mention}, you bought a **{1} upgrade** for **💵 {3}** gil. You now only have **💵 {2}** gil.".format(
-            ctx.author, upgrade_name, numutils.millify(_account.get_balance()), numutils.millify(upgrade_cost / 10000)
+        await ctx.send("{0.mention}, you bought a **{1} upgrade** for **💵 {3:.2f}** gil. You now only have **💵 {2:.2f}** gil.".format(
+            ctx.author, upgrade_name, _account.get_balance(), upgrade_cost / 10000
         ))
 
     @commands.command(aliases=["fp"])
@@ -214,15 +213,15 @@ class Farm(commands.Cog):
                 title="-=Current {0} Market Prices=-".format(_plant.name),
                 color=0xffd700
             )
-            bp = numutils.millify(_plant.get_buy_price())
-            sp = numutils.millify(_plant.get_sell_price())
+            bp = _plant.get_buy_price()
+            sp = _plant.get_sell_price()
             embed.add_field(
                 name="**`{0.tag}` - {0.name}**".format(_plant),
                 value=MSG_PLANT_PRICES.format(
                   _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
                 ) + 
-                "\nYour price: `{0} gil`".format(numutils.millify(_plant.get_farm_sell_price(_farm))) +
-                "\nYour yield: **{0}** units".format(numutils.millify(_plant.get_farm_yield(_farm))),
+                "\nYour price: `{0:.2f} gil`".format(_plant.get_farm_sell_price(_farm)) +
+                "\nYour yield: **{0}** units".format(_plant.get_farm_yield(_farm)),
                 inline=False
             )
         else:
@@ -247,8 +246,8 @@ class Farm(commands.Cog):
 
             final_str = ""
             for _plant in paginated_plants[page_number-1]:
-                bp = numutils.millify(_plant.get_buy_price())
-                sp = numutils.millify(_plant.get_sell_price())
+                bp = _plant.get_buy_price()
+                sp = _plant.get_sell_price()
                 embed.add_field(
                     name="**`{0.tag}` - {0.name}**".format(_plant),
                     value=MSG_PLANT_PRICES.format(
@@ -269,7 +268,7 @@ class Farm(commands.Cog):
         """Show the price of the next plot."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_plot_price()
-        await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, numutils.millify(result)))
+        await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, result))
 
     @commands.cooldown(1, 1, type=commands.BucketType.user)
     @commands.command()
@@ -281,16 +280,16 @@ class Farm(commands.Cog):
         if _account.has_balance(price, raw=True):
             _farm.add_plot(self.bot.db_session)
             _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
-            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(ctx.author, numutils.millify(_account.get_balance())))
+            await ctx.send(MSG_PLOT_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
         else:
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, numutils.millify(_account.get_balance())))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
     @commands.command(aliases=["silo$",])
     async def siloprice(self, ctx):
         """Show the price of the next silo (storage upgrade)."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_storage_upgrade_price()
-        await ctx.send(MSG_SILO_PRICE_CHECK.format(ctx.author, numutils.millify(result)))
+        await ctx.send(MSG_SILO_PRICE_CHECK.format(ctx.author, result))
 
     @commands.cooldown(1, 1, type=commands.BucketType.user)
     @commands.command()
@@ -302,9 +301,9 @@ class Farm(commands.Cog):
         if _account.has_balance(price, raw=True):
             _farm.upgrade_storage(self.bot.db_session)
             _account.add_debit(self.bot.db_session, price, name="SILOBUY", raw=True)
-            await ctx.send(MSG_SILO_BUY_SUCCESS.format(ctx.author, numutils.millify(_account.get_balance())))
+            await ctx.send(MSG_SILO_BUY_SUCCESS.format(ctx.author, _account.get_balance()))
         else:
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, numutils.millify(_account.get_balance())))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
 
     @commands.command()
     @commands.is_owner()
@@ -419,9 +418,9 @@ class Farm(commands.Cog):
             plant.randomize_price(self.bot.db_session)
         final_str = ""
         for plant in all_plants:
-            bp = numutils.millify(plant.get_buy_price())
-            sp = numutils.millify(plant.get_sell_price())
-            _str = "***{0.name}*** `[B: {1} gil | S: {2} gil]`\n".format(plant, bp, sp)
+            bp = plant.get_buy_price()
+            sp = plant.get_sell_price()
+            _str = "***{0.name}*** `[B: {1:.2f} gil | S: {2:.2f} gil]`\n".format(plant, bp, sp)
             final_str += _str
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
@@ -437,7 +436,7 @@ class Farm(commands.Cog):
         total_price = _plant.buy_price * plant_count
         
         if not _account.has_balance(total_price, raw=True):
-            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, numutils.millify(_account.get_balance())))
+            await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
             return
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _plots = _farm.get_available_plots(self.bot.db_session)
@@ -461,8 +460,8 @@ class Farm(commands.Cog):
         await ctx.send(
             MSG_PLOT_PLANT.format(
                 ctx.author, _plant,
-                plant_count, numutils.millify(total_price/10000),
-                numutils.millify(_account.get_balance())
+                plant_count, total_price/10000,
+                _account.get_balance()
             )
         )
 
@@ -494,7 +493,7 @@ class Farm(commands.Cog):
         for harvest in total_harvests:
             harvest_str += "**{0}**, {1} units\n".format(
                 id_to_plant_name[harvest],
-                numutils.millify(total_harvests[harvest])
+                total_harvests[harvest]
             )
 
         embed.add_field(name="Crops", value=harvest_str, inline=False)
@@ -569,7 +568,7 @@ class Farm(commands.Cog):
             harvest_str = ""
             for plant_name in harvest_stats:
                 harvest_str += "**{0}**, {1} units\n".format(
-                    plant_name, numutils.millify(harvest_stats[plant_name])
+                    plant_name, harvest_stats[plant_name]
                 )
             await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
         else:
@@ -618,8 +617,8 @@ class Farm(commands.Cog):
         _farm.decrease_storage(self.bot.db_session, total_amount)
 
         await ctx.send(MSG_SELL_SUCCESS.format(
-            ctx.author, total_amount, _plant, numutils.millify(raw_credit / 10000), numutils.millify(_account.get_balance()),
-            numutils.millify(plant_sell_price / 10000)
+            ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance(),
+            plant_sell_price / 10000
         ))
 
 
