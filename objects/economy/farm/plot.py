@@ -76,7 +76,7 @@ class Plot(Base):
         if not self.is_harvestable():
             return None
         new_harvest = Harvest(
-            amount = self.plant.get_farm_yield(self.farm),
+            amount = self.plant.base_harvest,
             plant = self.plant,
             farm = self.farm,
         )
@@ -99,4 +99,4 @@ class Plot(Base):
     def get_harvest_amount(self):
         if not self.is_harvestable():
             return 0
-        return self.plant.get_farm_yield(self.farm)
+        return self.plant.base_harvest
