@@ -465,6 +465,7 @@ class Farm(commands.Cog):
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
     @commands.command(aliases=["fpa"])
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def farmplant(self, ctx, plant_name, plant_count=1):
         """Plant a crop on a number of your available plots."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
