@@ -412,7 +412,7 @@ class Farm(commands.Cog):
         logging.info("Reconsolidated storages of {} farms.".format(len(all_farms)))
         await ctx.send("**All farm storages reconsolidated!**")
     
-    @commands.command()
+    @commands.command(aliases=['rpp',])
     @commands.is_owner()
     async def refreshplantprices(self, ctx):
         """(Owner) Manually refresh the global market prices."""
@@ -599,9 +599,11 @@ class Farm(commands.Cog):
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
 
         total_amount = 0
+        total_raw_amount = 0
         for i in range(len(_farm.harvests))[::-1]:
             if _farm.harvests[i].plant.id == _plant.id:
                 total_amount += _farm.harvests[i].amount
+                total_raw_amount += _plant.base_harvest
                 del _farm.harvests[i]
 
         if total_amount == 0:
@@ -616,7 +618,8 @@ class Farm(commands.Cog):
             raw=True
         )
         
-        _plant.decrement_demand(self.bot.db_session, total_amount)
+        logging.info(total_raw_amount)
+        _plant.decrement_demand(self.bot.db_session, total_raw_amount)
         _farm.decrease_storage(self.bot.db_session, total_amount)
 
         await ctx.send(MSG_SELL_SUCCESS.format(

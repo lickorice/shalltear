@@ -29,6 +29,7 @@ class Plant(Base):
 
     current_demand = Column(BigInteger)
     base_demand = Column(BigInteger)
+    current_demand_factor = Column(BigInteger, default=40000)
 
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
@@ -50,7 +51,8 @@ class Plant(Base):
     
     def get_sell_price(self, raw=False):
         cd, bd = self.current_demand, self.base_demand
-        sell_price = (self.current_sell_price / 2) * 4**((cd**2)/(bd**2))
+        df = self.current_demand_factor / 10000
+        sell_price = (self.current_sell_price / 2) * df**((cd**2)/(bd**2))
         sell_price = int(sell_price)
         if raw:
             return sell_price
@@ -74,16 +76,25 @@ class Plant(Base):
         _plots = Plot.get_plots_count(session)
         
         # Demand calculation
-        growth_rate = 3600 / min(self.growing_seconds, 3600)
+        growth_rate = max(3600 / self.growing_seconds, 1)
         _demand = self.base_harvest * growth_rate * (_plots)
-        logging.info("{}: {}".format(self.name, _demand))
+
+        # Demand factor calculation
+        df = self.current_demand_factor
+        bd, cd = self.base_demand, self.current_demand
+        market_change_percent = (cd - (bd*0.75)) / bd
+        new_demand_factor = df * 4 ** market_change_percent
+        self.current_demand_factor = new_demand_factor
+        
+        logging.info("Recalculated {}: {} => {}".format(self.tag, _demand, new_demand_factor / 10000))
+        
         self.base_demand = max(int(_demand / DEMAND_DIVISOR), 1)
         self.current_demand = max(int(_demand / DEMAND_DIVISOR), 1)
         
         # Price calculation
         _r = self.randomness_factor
-        factor = randint(10000-_r, 10000+_r) / 10000
-        self.current_sell_price = int(self.base_sell_price*factor)
+        rand_factor = randint(10000-_r, 10000+_r) / 10000
+        self.current_sell_price = int(self.base_sell_price*rand_factor)
 
         session.add(self)
         PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)

@@ -13,14 +13,6 @@ class Admin(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
-    async def tester(self, ctx):
-        guilds = self.bot.guilds
-        for g in guilds:
-            logging.info("[{0.id}] {0.name}".format(g))
-            # await ctx.send("{0.name} ({0.id})".format(g))
-
-    @commands.command()
-    @commands.is_owner()
     async def kill(self, ctx):
         """(Owner) Shuts down the bot."""
         await ctx.send(MSG_SHUT_DOWN)

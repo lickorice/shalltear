@@ -12,7 +12,7 @@ class Harvest(Base):
 
     id = Column(Integer, primary_key=True)
 
-    amount = Column(Integer)
+    amount = Column(BigInteger)
     plant_id = Column(BigInteger, ForeignKey('farm_plants.id'))
     plant = relationship("Plant")
 
