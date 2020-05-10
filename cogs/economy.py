@@ -55,6 +55,30 @@ class Economy(commands.Cog):
 
     @commands.command()
     @commands.is_owner()
+    async def admingiveall(self, ctx, amount: float):
+        """(Owner) Grant everyone gil."""
+        if amount < 0:
+            await ctx.send(CMD_GIVE_INVALID_AMOUNT)
+            return
+        all_accounts = EconomyAccount.get_all_economy_accounts(self.bot.db_session)
+        for _account in all_accounts:
+            _account.add_credit(self.bot.db_session, amount, "Admin grant.")
+        await ctx.send("**Compensation finished.**")
+
+    @commands.command()
+    @commands.is_owner()
+    async def purgeaccounts(self, ctx):
+        """(Owner) Purge all accounts with transactions less than 5."""
+        all_accounts = EconomyAccount.get_all_economy_accounts(self.bot.db_session)
+        for _account in all_accounts:
+            if len(_account.transactions) <= 5:
+                logging.info("Deleting {}...".format(_account))
+                del _account
+
+        await ctx.send("**Purging finished.**")
+    
+    @commands.command()
+    @commands.is_owner()
     async def admingive(self, ctx, amount: float, target: discord.Member=None):
         """(Owner) Grant target gil."""
         if amount < 0:
