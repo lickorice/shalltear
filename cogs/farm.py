@@ -12,28 +12,11 @@ from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
-from objects.economy.farm.upgrade import Upgrade
 
 
 class Farm(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
-
-    @commands.command()
-    @commands.is_owner()
-    async def migrate(self, ctx):
-        all_farms = ORMFarm.get_all_farms(self.bot.db_session)
-        for _farm in all_farms:
-            _farm.upgrades = []
-            for UPGRADE in FARM_UPGRADES:
-                _farm.upgrades.append(Upgrade(
-                    name=UPGRADE, 
-                    base_price=FARM_UPGRADES[UPGRADE]["base"],
-                    upgrade_type=FARM_UPGRADES[UPGRADE]["type"]
-                ))
-            self.bot.db_session.add(_farm)
-        self.bot.db_session.commit()
-        await ctx.send("**Successfully migrated all farms.**")
 
     @commands.command(aliases=["f"])
     async def farm(self, ctx, target: discord.Member=None):

@@ -60,7 +60,7 @@ class Farm(Base):
                 name=UPGRADE, 
                 base_price=FARM_UPGRADES[UPGRADE]["base"],
                 upgrade_type=FARM_UPGRADES[UPGRADE]["type"]
-            ))
+        ))
         session.add(new_farm)
         session.commit()
         return new_farm
