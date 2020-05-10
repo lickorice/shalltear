@@ -7,7 +7,6 @@ from sqlalchemy.orm import relationship
 from config import *
 from objects.base import Base
 from objects.economy.farm.plot import Plot
-from objects.economy.farm.upgrade import Upgrade
 
 
 class Farm(Base):
@@ -26,7 +25,6 @@ class Farm(Base):
 
     harvests = relationship("Harvest", back_populates="farm", cascade="all, delete, delete-orphan")
     plots = relationship("Plot", back_populates="farm")
-    upgrades = relationship("Upgrade", back_populates="farm", lazy="dynamic")
 
     def __repr__(self):
         return "<Farm id={0.id}, user_id={0.id}, plots={0.plots}>".format(self)\
@@ -54,11 +52,6 @@ class Farm(Base):
         new_farm.plots = [
             Plot(), Plot(), Plot() # Default 3 plots
         ]
-        new_farm.upgrades = []
-        for UPGRADE in FARM_UPGRADES:
-            new_farm.upgrades.append(
-                Upgrade(name=UPGRADE, base_price=FARM_UPGRADES[UPGRADE]["base"])
-            )
         session.add(new_farm)
         session.commit()
         return new_farm
@@ -70,21 +63,6 @@ class Farm(Base):
         if result is None:
             return Farm.create_farm(user, session)
         return result
-
-    def upgrade(self, session, upgrade_name):
-        _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
-        _upgrade.level += 1
-        session.add(_upgrade)
-        session.commit()
-    
-    def get_upgrade_cost(self, upgrade_name, raw=False):
-        _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
-        base = _upgrade.base_price
-        factor = _upgrade.factor
-        level = _upgrade.level
-        if raw:
-            return (base * ((level+1)**factor)) / 10000
-        return base * ((level+1)**factor)
 
     def get_name(self, session):
         if self.name is None:

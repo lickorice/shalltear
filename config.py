@@ -33,39 +33,6 @@ ACTIVE_SEEDERS = [
 
 TRANSFER_TAX = 0.01
 
-FARM_UPGRADES = {
-    "farmers":
-    {
-        "type": "production",
-        "upgrades": 0.05,
-        "base": 1000000, "factor": 1.25
-    },
-    "tractors":
-    {
-        "type": "production",
-        "upgrades": 0.05,
-        "base": 10000000, "factor": 1.25
-    },
-    "cropdusters":
-    {
-        "type": "production",
-        "upgrades": 0.05,
-        "base": 100000000, "factor": 1.25
-    },
-    "accountants":
-    {
-        "type": "prices",
-        "upgrades": 0.05,
-        "base": 1000000, "factor": 1.25
-    },
-    "businessmen":
-    {
-        "type": "prices",
-        "upgrades": 0.05,
-        "base": 100000000, "factor": 1.25
-    },
-}
-
 BASE_PLOT_PRICE = 500000
 PLOT_PRICE_FACTOR = 1.45
 
