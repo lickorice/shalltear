@@ -66,10 +66,6 @@ class Plant(Base):
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
         _plots = Plot.get_plots_count(session)
-        
-        # Demand calculation
-        growth_rate = max(3600 / self.growing_seconds, 1)
-        _demand = self.base_harvest * growth_rate * (_plots)
 
         # Demand factor calculation
         df = self.current_demand_factor
@@ -77,6 +73,10 @@ class Plant(Base):
         market_change_percent = (cd - (bd*0.90)) / bd
         new_demand_factor = df * 4 ** market_change_percent
         self.current_demand_factor = new_demand_factor
+        
+        # Demand calculation
+        growth_rate = max(3600 / self.growing_seconds, 1)
+        _demand = self.base_harvest * growth_rate * (_plots) * (df / 4)
         
         logging.info("Recalculated {}: {} => {}".format(self.tag, _demand, new_demand_factor / 10000))
         
