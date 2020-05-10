@@ -101,8 +101,11 @@ class Farm(commands.Cog):
         ))
 
     @commands.command(aliases=["u$"])
-    async def upgradeprice(self, ctx, upgrade_name=None):
-        """Check upgrade prices."""
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def upgradeprice(self, ctx, upgrade_name=None, up_count: int=1):
+        """Check upgrade prices. You can specify an upgrade count <= 100."""
+        up_count = max(1, up_count)
+        up_count = min(100, up_count)
         if upgrade_name is None:
             embed = discord.Embed(
                 title="{0.name}#{0.discriminator}'s Upgrade Prices".format(ctx.author),
@@ -121,14 +124,17 @@ class Farm(commands.Cog):
                 await ctx.send(MSG_CMD_INVALID.format(ctx.author))
                 return
             _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-            upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
-            await ctx.send("{0.mention}, your next **{1}** upgrade costs **💵 {2}** gil.".format(
-                ctx.author, upgrade_name.capitalize(), numutils.millify(upgrade_cost)
+            upgrade_cost = _farm.get_upgrade_cost(upgrade_name, up_count=up_count)
+            await ctx.send("{0.mention}, your next {3} **{1}** upgrades costs **💵 {2}** gil.".format(
+                ctx.author, upgrade_name.capitalize(), numutils.millify(upgrade_cost), up_count
             ))
 
     @commands.command(aliases=["ubuy"])
-    async def upgradebuy(self, ctx, upgrade_name=None):
+    @commands.cooldown(1, 5, type=commands.BucketType.user)
+    async def upgradebuy(self, ctx, upgrade_name=None, up_count=1):
         """Buy an upgrade."""
+        up_count = max(1, up_count)
+        up_count = min(100, up_count)
         if upgrade_name is None:
             await ctx.send(MSG_CMD_INVALID.format(ctx.author))
             return
@@ -139,7 +145,7 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
 
-        upgrade_cost = _farm.get_upgrade_cost(upgrade_name, raw=True)
+        upgrade_cost = _farm.get_upgrade_cost(upgrade_name, raw=True, up_count=up_count)
 
         if not _account.has_balance(upgrade_cost, raw=True):
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
@@ -147,13 +153,15 @@ class Farm(commands.Cog):
             ))
             return
         
-        _farm.upgrade(self.bot.db_session, upgrade_name)
+        _farm.upgrade(self.bot.db_session, upgrade_name, up_count)
         _account.add_debit(self.bot.db_session, upgrade_cost,
             name="U:{}".format(upgrade_name), raw=True
         )
         
-        await ctx.send("{0.mention}, you bought a **{1} upgrade** for **💵 {3}** gil. You now only have **💵 {2}** gil.".format(
-            ctx.author, upgrade_name, numutils.millify(_account.get_balance(), is_money=True), numutils.millify(upgrade_cost / 10000, is_money=True)
+        await ctx.send("{0.mention}, you bought {4} **{1} upgrades** for **💵 {3}** gil. You now only have **💵 {2}** gil.".format(
+            ctx.author, upgrade_name, numutils.millify(_account.get_balance(), is_money=True),
+            numutils.millify(upgrade_cost / 10000, is_money=True),
+            up_count
         ))
 
     @commands.command(aliases=["fp"])

@@ -91,15 +91,15 @@ class Farm(Base):
             base_factor *= (1+(0.05*_upgrade.level))
         return base_factor
 
-    def upgrade(self, session, upgrade_name):
+    def upgrade(self, session, upgrade_name, up_count=1):
         _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
-        _upgrade.level += 1
+        _upgrade.level += up_count
         session.add(_upgrade)
         session.commit()
     
-    def get_upgrade_cost(self, upgrade_name, raw=False):
+    def get_upgrade_cost(self, upgrade_name, raw=False, up_count=1):
         _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
-        return _upgrade.get_next_level_cost(raw=raw)
+        return _upgrade.get_next_level_cost(raw=raw, up_count=up_count)
 
     def get_name(self, session):
         if self.name is None:
