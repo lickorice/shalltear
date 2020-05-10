@@ -282,7 +282,10 @@ class Farm(commands.Cog):
         up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_plot_price(up_count=up_count)
-        await ctx.send(MSG_PLOT_PRICE_CHECK.format(ctx.author, numutils.millify(result, is_money=True)))
+        await ctx.send(MSG_PLOT_PRICE_CHECK.format(
+            ctx.author, numutils.millify(result, is_money=True),
+            numutils.millify(up_count)
+        ))
 
     @commands.command()
     @commands.cooldown(1, 5, type=commands.BucketType.user)
@@ -298,7 +301,7 @@ class Farm(commands.Cog):
             _account.add_debit(self.bot.db_session, price, name="PLOTBUY", raw=True)
             await ctx.send(MSG_PLOT_BUY_SUCCESS.format(
                 ctx.author, numutils.millify(_account.get_balance(), is_money=True),
-                up_count
+                numutils.millify(up_count)
             ))
         else:
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
@@ -314,7 +317,10 @@ class Farm(commands.Cog):
         up_count = min(1000000, up_count)
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         result = _farm.get_next_storage_upgrade_price(up_count=up_count)
-        await ctx.send(MSG_SILO_PRICE_CHECK.format(ctx.author, numutils.millify(result, is_money=True)))
+        await ctx.send(MSG_SILO_PRICE_CHECK.format(
+            ctx.author, numutils.millify(result, is_money=True),
+            numutils.millify(up_count)
+        ))
 
     @commands.command()
     @commands.cooldown(1, 5, type=commands.BucketType.user)
@@ -330,7 +336,7 @@ class Farm(commands.Cog):
             _account.add_debit(self.bot.db_session, price, name="SILOBUY", raw=True)
             await ctx.send(MSG_SILO_BUY_SUCCESS.format(
                 ctx.author, numutils.millify(_account.get_balance(), is_money=True),
-                up_count
+                numutils.millify(up_count)
             ))
         else:
             await ctx.send(MSG_INSUFFICIENT_FUNDS_EXTRA.format(
