@@ -20,7 +20,7 @@ class Economy(commands.Cog):
             target = ctx.author
         # Get current economy account
         account = EconomyAccount.get_economy_account(target, self.bot.db_session)
-        await ctx.send(CMD_GIL.format(target, numutil.millify(account.get_balance())))
+        await ctx.send(CMD_GIL.format(target, numutils.millify(account.get_balance(), is_money=True)))
 
     @commands.command(aliases=["$top",])
     async def giltop(self, ctx):
@@ -32,7 +32,7 @@ class Economy(commands.Cog):
         for account in top_accounts:
             user = self.bot.get_user(account.user_id)
             user_name = "#{1} **{0.name}#{0.discriminator}**".format(user, rank)
-            gil_amount = "💵 {0} gil".format(numutil.millify(account.get_balance()))
+            gil_amount = "💵 {0} gil".format(numutils.millify(account.get_balance(), is_money=True))
             embed.add_field(name=user_name, value=gil_amount, inline=False)
             rank += 1
 
@@ -65,7 +65,7 @@ class Economy(commands.Cog):
             target = ctx.author
         target_account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         target_account.add_credit(self.bot.db_session, amount, "Admin grant.")
-        await ctx.send(CMD_ADMIN_GIVE.format(target, numutil.millify(amount)))
+        await ctx.send(CMD_ADMIN_GIVE.format(target, numutils.millify(amount, is_money=True)))
 
     @commands.command()
     @commands.is_owner()
@@ -78,7 +78,7 @@ class Economy(commands.Cog):
             target = ctx.author
         target_account = EconomyAccount.get_economy_account(target, self.bot.db_session)
         target_account.add_debit(self.bot.db_session, amount, "Admin grant.")
-        await ctx.send(CMD_ADMIN_TAKE.format(target, numutil.millify(amount)))
+        await ctx.send(CMD_ADMIN_TAKE.format(target, numutils.millify(amount, is_money=True)))
 
     @commands.command()
     @commands.is_owner()
@@ -118,14 +118,14 @@ class Economy(commands.Cog):
 
         if not author_account.has_balance(debit):
             await ctx.send(
-                CMD_GIVE_INSUFFICIENT_AMOUNT.format(ctx.author, numutil.millify(target_account.get_balance()))
+                CMD_GIVE_INSUFFICIENT_AMOUNT.format(ctx.author, numutils.millify(target_account.get_balance(), is_money=True))
             )
             return
 
         target_account.add_credit(self.bot.db_session, credit, "T:{}".format(ctx.author.id))
         author_account.add_debit(self.bot.db_session, debit, "T:{}".format(target.id))
 
-        await ctx.send(CMD_GIVE_SUCCESS.format(ctx.author, numutil.millify(credit), target))
+        await ctx.send(CMD_GIVE_SUCCESS.format(ctx.author, numutils.millify(credit, is_money=True), target))
 
 
 def setup(bot):
