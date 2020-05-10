@@ -25,6 +25,7 @@ $ python3 run.py
 ## Changelog
 ### `v0.0.4b`
 - Introduce new plants Wheat, Tomato, Sugarcane, Coconut, Banana, Lemon, and Hops.
+- Adjust demand calculation system to consider past demand in factoring in the influence of the soon-to-be calculated demand.
 - **Introduce a new crop storage system.** All farms will start with 100 storage, and each new storage upgrade will add an additional 100 storage to your farm. Storage upgrade prices scale (much like plot prices, but are more forgiving) as you purchase new upgrades.
 - Add new commands `s!siloprice [s!silo$]` and `s!silobuy`, to check the price of your next storage upgrade and to buy it, respectively. `s!silobuy`, however, has a cooldown of 1 second.
 - Add new commands `s!farmtop [s!ftop]` to view top farms globally.
