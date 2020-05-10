@@ -76,7 +76,7 @@ class Plant(Base):
         
         # Demand calculation
         growth_rate = max(3600 / self.growing_seconds, 1)
-        _demand = self.base_harvest * growth_rate * (_plots) * (df / 4)
+        _demand = self.base_harvest * growth_rate * (_plots) * (4 / df)
         
         logging.info("Recalculated {}: {} => {}".format(self.tag, _demand, new_demand_factor / 10000))
         

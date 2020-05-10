@@ -73,7 +73,7 @@ class Economy(commands.Cog):
         for _account in all_accounts:
             if len(_account.transactions) <= 5:
                 logging.info("Deleting {}...".format(_account))
-                del _account
+                self.bot.db_session.delete(_account)
 
         await ctx.send("**Purging finished.**")
     
