@@ -29,8 +29,3 @@ class Upgrade(Base):
 
     def __repr__(self):
         return "<Upgrade name={0.name}, farm_id={0.farm_id}, level={0.level}>".format(self)
-
-    def get_next_level_cost(self, raw=False):
-        if not raw:
-            return (self.base_price * ((self.level+1)**self.factor)) / 10000
-        return (self.base_price * ((self.level+1)**self.factor))

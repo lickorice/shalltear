@@ -99,7 +99,12 @@ class Farm(Base):
     
     def get_upgrade_cost(self, upgrade_name, raw=False):
         _upgrade = self.upgrades.filter(Upgrade.name==upgrade_name).first()
-        return _upgrade.get_next_level_cost(raw=raw)
+        base = _upgrade.base_price
+        factor = _upgrade.factor
+        level = _upgrade.level
+        if not raw:
+            return (base * ((level+1)**factor)) / 10000
+        return base * ((level+1)**factor)
 
     def get_name(self, session):
         if self.name is None:

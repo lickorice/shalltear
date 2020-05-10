@@ -99,34 +99,19 @@ class Farm(commands.Cog):
         ))
 
     @commands.command(aliases=["u$"])
-    async def upgradeprice(self, ctx, upgrade_name=None):
-        """Check upgrade prices."""
-        if upgrade_name is None:
-            embed = discord.Embed(
-                title="{0.name}#{0.discriminator}'s Upgrade Prices".format(ctx.author),
-                color=0xffd700
-            )
-            _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-            for _upgrade in _farm.upgrades:
-                embed.add_field(
-                    name=_upgrade.name.capitalize(),
-                    value="`{0:.2f} gil`".format(_upgrade.get_next_level_cost(raw=False))
-                )
-            await ctx.send(embed=embed)
-        else:
-            upgrade_name = upgrade_name.lower()
-            if upgrade_name not in FARM_UPGRADES:
-                await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-                return
-            _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-            upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
-            await ctx.send("The next **{0}** upgrade costs **💵 {1:.2f}** gil.".format(
-                upgrade_name.capitalize(), upgrade_cost
-            ))
+    async def upgradeprice(self, ctx, upgrade_name):
+        upgrade_name = upgrade_name.lower()
+        if upgrade_name not in FARM_UPGRADES:
+            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
+            return
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        upgrade_cost = _farm.get_upgrade_cost(upgrade_name)
+        await ctx.send("The next **{0}** upgrade costs **💵 {1:.2f}** gil.".format(
+            upgrade_name, upgrade_cost
+        ))
 
     @commands.command(aliases=["ubuy"])
     async def upgradebuy(self, ctx, upgrade_name=None):
-        """Buy an upgrade."""
         if upgrade_name is None:
             await ctx.send(MSG_CMD_INVALID.format(ctx.author))
             return
