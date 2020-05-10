@@ -10,3 +10,6 @@ __pycache__
 # SQLite Database
 data.db
 query.sql
+
+errors.log
+runtime.log
