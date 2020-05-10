@@ -165,6 +165,7 @@ class Farm(commands.Cog):
         ))
 
     @commands.command(aliases=["fp"])
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def farmplots(self, ctx, page_number: int=1):
         """Show the details of your plots."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
@@ -544,6 +545,7 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def farmharvest(self, ctx, harvest_range=None):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
