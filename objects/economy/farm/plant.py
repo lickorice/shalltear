@@ -76,6 +76,9 @@ class Plant(Base):
         time_now = datetime.now()
         plant_stats_24h = self.price_logs[:24]
         
+        # x_points = [ 
+        #     _stat.refreshed_at.strftime("%H:%M") for _stat in plant_stats_24h
+        # ]
         x_points = [ 
             _stat.refreshed_at.strftime("%H:%M") for _stat in plant_stats_24h
         ]
