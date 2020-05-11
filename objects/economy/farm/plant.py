@@ -66,8 +66,10 @@ class Plant(Base):
 
     def generate_graph(self, session):
         time_now = datetime.now()
-
+        
         _plantstats = PriceLog.get_plant_price_logs(self, session)
+        number_of_entries = 48 if len(_plantstats) >= 48 else len(_plantstats)
+        _plantstats = _plantstats[len(_plantstats) - number_of_entries:len(_plantstats)]
 
         # Define x-axis labels
         def x_label(time):
