@@ -1,23 +1,29 @@
 import logging
 
-import discord
+import discord, schedule
 from discord.ext import commands
 
 from config import *
 from messages.admin import *
+import utils.database as dbutils
 
 
 class Admin(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
 
-    @commands.command()
+    @commands.command(aliases=["bk",])
     @commands.is_owner()
-    async def tester(self, ctx):
-        guilds = self.bot.guilds
-        for g in guilds:
-            logging.info("[{0.id}] {0.name}".format(g))
-            # await ctx.send("{0.name} ({0.id})".format(g))
+    async def backup(self, ctx):
+        """Manually backup the database"""
+        # TODO: Still only applicable for SQLite database.
+        await ctx.send("**Backing up the database...**")
+
+        backup_file = dbutils.backup()
+
+        await ctx.send("**Database successfully backed up with filename `{0}`.**".format(
+            backup_file
+        ))
 
     @commands.command()
     @commands.is_owner()
@@ -59,6 +65,11 @@ class Admin(commands.Cog):
             await ctx.send("No cogs have been successfully reloaded.")
 
 
+def backup_midnight():
+    logging.info("Applying daily backup...")
+    dbutils.backup()
+
+
 def setup(bot):
     bot.add_cog(Admin(bot))
-
+    schedule.every().day.at("00:00").do(backup_midnight)

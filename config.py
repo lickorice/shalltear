@@ -9,6 +9,7 @@ SECRETS_FILE = "secrets.json"
 
 # Location of resources
 ASSETS_DIRECTORY = "assets/"
+BACKUP_DIRECTORY = "backup/"
 
 # Logging format
 LOGGING_FORMAT = "(%(asctime)s) [%(levelname)s] - %(message)s"

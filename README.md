@@ -24,6 +24,9 @@ $ python3 run.py
 
 ## Changelog
 ### `v0.1.0b` (Items and Auction Update)
+- Miscellaneous administration tools:
+    - Add manual backup command of the database.
+    - Add automated midnight backup routine of the database.
 ### `v0.0.5b revised` (Quality of Life and Balancing updates)
 - Introduce new plants Lettuce, Pineapple, Pepper, Mango, and Passionfruit.
 - Buff longer term plants like Watermelon, Pumpkin, Grapes, Sugarcane, and Coconut.
