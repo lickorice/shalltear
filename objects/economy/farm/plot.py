@@ -75,10 +75,11 @@ class Plot(Base):
     def harvest(self, session, commit_on_execution=True):
         if not self.is_harvestable():
             return None
-        new_harvest = Harvest(
-            amount = self.plant.base_harvest,
-            plant = self.plant,
-            farm = self.farm,
+
+        # Pass to an information wrapper
+        harvest_info = HarvestInfo(
+            plant=self.plant,
+            amount=self.plant.base_harvest
         )
 
         # Increment storage space used
@@ -91,12 +92,19 @@ class Plot(Base):
         # Database actions
         session.add(self)
         session.add(self.farm)
-        session.add(new_harvest)
+
         if commit_on_execution:
             session.commit()
-        return new_harvest
+
+        return harvest_info
 
     def get_harvest_amount(self):
         if not self.is_harvestable():
             return 0
         return self.plant.base_harvest
+
+
+class HarvestInfo:
+    def __init__(self, plant, amount):
+        self.plant = plant
+        self.amount = amount

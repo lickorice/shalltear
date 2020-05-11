@@ -10,6 +10,7 @@ from messages.farm import *
 from messages.core import MSG_CMD_INVALID
 from objects.economy.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
+from objects.economy.farm.harvest import Harvest
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
 
@@ -528,34 +529,44 @@ class Farm(commands.Cog):
             ))
             return
 
+        if storage_needed == 0:
+            await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
+            return
+
         # Actual harvesting
-
         await ctx.send("Harvesting **{0.name}#{0.discriminator}**'s crops...\n".format(ctx.author))
-    
-        harvest_stats = {}
-        has_harvest = False
 
+        # Collect harvesting info
+        harvest_stats = {}
         for i in range(harvest_range[0]-1, harvest_range[1]):
             _harvest = _farm.plots[i].harvest(self.bot.db_session, commit_on_execution=False)
             if _harvest is None:
                 continue
 
-            has_harvest = True
             if _harvest.plant.name not in harvest_stats:
                 harvest_stats[_harvest.plant.name] = 0
             harvest_stats[_harvest.plant.name] += _harvest.amount
 
-        self.bot.db_session.commit()
+        # Collate harvest info
+        harvest_str = ""
+        for plant_name in harvest_stats:
+            _plant = Plant.get_plant(self.bot.db_session, plant_name)
+            new_harvest = Harvest(
+                plant_id=_plant.id,
+                amount=harvest_stats[plant_name],
+                farm_id=_farm.id
+            )
 
-        if has_harvest:
-            harvest_str = ""
-            for plant_name in harvest_stats:
-                harvest_str += "**{0}**, {1} units\n".format(
-                    plant_name, harvest_stats[plant_name]
-                )
-            await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
-        else:
-            await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
+            self.bot.db_session.add(new_harvest)
+
+            harvest_str += "**{0}**, {1} units\n".format(
+                plant_name, harvest_stats[plant_name]
+            )
+        
+        # Commit to DB
+        self.bot.db_session.commit()
+        
+        await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
         
     @commands.command(aliases=["pstats", "pstat"])
     @commands.cooldown(1, 60, type=commands.BucketType.user)
