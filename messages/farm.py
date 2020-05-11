@@ -30,3 +30,8 @@ MSG_SHOW_HARVESTS_NONE = "{0.mention}, you have no harvested crops."
 MSG_SHOW_HARVESTS = "{0.mention}, your current unsold harvests are:\n{1}"
 MSG_SILO_PRICE_CHECK = "{0.mention}, your next **{2}** silos costs **💵 {1:,.2f} gil**. Each new silo upgrades your crop storage by 100."
 MSG_SILO_BUY_SUCCESS = "{0.mention}, you have successfully bought **{2}** new silos! Your new balance is now **💵 {1:,.2f} gil**."
+MSG_SHOW_STATS = (
+    "***{0} Price History***\n"
+    "***Y-axis*** ` Initial sell price `\n"
+    "***X-axis*** ` (Date) | (Hour) `\n"
+)
