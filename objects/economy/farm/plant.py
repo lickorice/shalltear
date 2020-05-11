@@ -77,7 +77,7 @@ class Plant(Base):
 
         # Format y-axis labels
         def y_label(price):
-            return round((price / 2) * 4 / 10000, 2)
+            return round(price, 2)
         
         # Graph axes
         time_x = [x_label(log.refreshed_at) for log in _plantstats]
