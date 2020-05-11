@@ -558,7 +558,7 @@ class Farm(commands.Cog):
             await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
         
     @commands.command(aliases=["pstats", "pstat"])
-    @commands.cooldown(1, 20, type=commands.BucketType.user)
+    @commands.cooldown(1, 60, type=commands.BucketType.user)
     async def plantstats(self, ctx, plant_name):
         """Check plant price stats for the past 48 refreshes."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
@@ -607,8 +607,14 @@ class Farm(commands.Cog):
             value="💵 `{0:,.2f}` gil/unit".format(mean_sale / 10000),
             inline=False
         )
+        embed.add_field(
+            name="Current Demand",
+            value="`{0:,} / {1:,}` units".format(
+                _plant.current_demand, _plant.base_demand
+            ),
+            inline=False
+        )
 
-        
         graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}.png".format(_plant.tag.upper())
         graph = discord.File(graph_file, filename="image.png")
         embed.set_image(url="attachment://image.png")

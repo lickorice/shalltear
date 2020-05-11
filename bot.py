@@ -28,7 +28,7 @@ class BotCore(commands.AutoShardedBot):
 
     async def on_command_error(self, ctx, err):
         if type(err) == discord.ext.commands.errors.CommandOnCooldown:
-            await ctx.send("**{0.mention}, try again.** **__{1}__**".format(ctx.author, err))
+            await ctx.send("{0.mention}: **__{1}__**".format(ctx.author, err))
             return
         logging.error("Command error: {0} [author: {1.author}][cmd: {1.command}]".format(err, ctx))
         await ctx.send("**{0.mention}, that's an invalid command format.**".format(ctx.author))
