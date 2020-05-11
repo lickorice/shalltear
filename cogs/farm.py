@@ -4,8 +4,9 @@ from math import log10
 
 import discord, schedule
 from discord.ext import commands
+import matplotlib.pyplot as plt
 
-from config import FARM_NAME_CHANGE_PRICE, FARM_PLOTS_MAX
+from config import *
 from messages.farm import *
 from messages.core import MSG_CMD_INVALID
 from objects.economy.account import EconomyAccount
@@ -13,7 +14,6 @@ from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
 
-import matplotlib.pyplot as plt
 
 class Farm(commands.Cog):
     def  __init__(self, bot):
@@ -559,7 +559,7 @@ class Farm(commands.Cog):
             await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
         
     @commands.command(aliases=["pstats", "pstat"])
-    # @commands.cooldown(1, 20, type=commands.BucketType.user)
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def plantstats(self, ctx, plant_name):
         """Check plant price stats for the past 48 refreshes."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
@@ -612,9 +612,9 @@ class Farm(commands.Cog):
             inline=False
         )
         
-        graph_filename = r"images\{}_graph.png".format(_plant.name.lower())
+        graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}_graph.png".format(_plant.name.lower())
 
-        await ctx.send(embed=embed, file=discord.File(graph_filename))
+        await ctx.send(embed=embed, file=discord.File(graph_file))
 
 
     @commands.command(aliases=["fs"])

@@ -13,3 +13,6 @@ query.sql
 
 errors.log
 runtime.log
+
+# Generated graphs
+assets/graphs/plant_prices/

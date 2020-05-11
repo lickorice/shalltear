@@ -4,7 +4,7 @@ import logging
 
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 
-from config import DEMAND_DIVISOR
+from config import *
 from objects.base import Base
 from objects.economy.farm.plot import Plot
 from objects.economy.farm.farm import Farm
@@ -105,9 +105,13 @@ class Plant(Base):
                 ha='center'
             )
 
+        # Make sure graph file exists
+        graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}_graph.png".format(self.name.lower())
+        # k = open(graph_file, 'w+')
+        # k.close()
+
         # Save graph
-        plt.savefig(r"images\{}_graph.png".format(self.name.lower()))
-        logging.info("Successfully generated {} graph.".format(self.name))
+        plt.savefig(graph_file)
 
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
