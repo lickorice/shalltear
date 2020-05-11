@@ -23,6 +23,13 @@ $ python3 run.py
 ```
 
 ## Changelog
+### `v0.0.5b revised` (Quality of Life and Balancing updates)
+- Introduce new plants Lettuce, Pineapple, Pepper, Mango, and Passionfruit.
+- Buff longer term plants like Watermelon, Pumpkin, Grapes, Sugarcane, and Coconut.
+- **Add plant price logging.** To view statistics of your crop, you can use the command `s!pstats <plant_name>`.
+- Add comma separation in gil display.
+- Add en-masse purchasing of plots and silos, through `s!plotbuy <plot_count>`, or `s!silobuy <silo_count>`. The same can be done with `s!plotprice` and `s!siloprice`, respectively.
+- Add a hard limit to plots, which is currently set to `1000`. Further progression will be introduced in following updates.
 ### `v0.0.4b`
 - Introduce new plants Wheat, Tomato, Sugarcane, Coconut, Banana, Lemon, and Hops.
 - Adjust demand calculation system to consider past demand in factoring in the influence of the soon-to-be calculated demand.
