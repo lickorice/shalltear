@@ -22,7 +22,7 @@ MSG_SELL_SUCCESS = "{0.mention}, you sold **{1} units** of **{2.name}** for a to
 MSG_SHOW_HARVESTS_NONE = "{0.mention}, you have no harvested crops."
 MSG_SHOW_HARVESTS = "{0.mention}, your current unsold harvests are:\n{1}"
 MSG_SHOW_STATS = (
-    "***{0} Price History***\n"
+    "**{0} Price History**\n"
     "***Y-axis*** ` Initial sell price `\n"
     "***X-axis*** ` (Date) | (Hour) `\n"
 )

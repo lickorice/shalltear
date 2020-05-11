@@ -11,6 +11,7 @@ from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
 
+import matplotlib.pyplot as plt
 
 class Farm(commands.Cog):
     def  __init__(self, bot):
@@ -282,8 +283,13 @@ class Farm(commands.Cog):
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
-            return
-        logging.info(PriceLog.get_plant_price_logs(_plant, self.bot.db_session))
+
+        graph_filename = r"images\{}_graph.png".format(_plant.name.lower())
+
+        await ctx.send(
+            MSG_SHOW_STATS.format(_plant.name.capitalize()),
+            file=discord.File(graph_filename)
+        )
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):
@@ -318,7 +324,6 @@ class Farm(commands.Cog):
         await ctx.send(MSG_SELL_SUCCESS.format(
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance()
         ))
-
 
 def get_growing_time_string(growing_time_in_seconds):
     growing_time = timedelta(seconds=growing_time_in_seconds)

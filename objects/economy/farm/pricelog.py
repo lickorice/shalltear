@@ -35,4 +35,3 @@ class PriceLog(Base):
     @staticmethod
     def get_plant_price_logs(plant, session):
         return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).all()
-        
