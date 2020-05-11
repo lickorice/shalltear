@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 import logging
 
@@ -10,6 +10,7 @@ from objects.economy.farm.plot import Plot
 from objects.economy.farm.farm import Farm
 from objects.economy.farm.pricelog import PriceLog
 
+import matplotlib.pyplot as plt
 
 class Plant(Base):
     __tablename__ = 'farm_plants'
@@ -61,6 +62,49 @@ class Plant(Base):
         session.add(self)
         session.commit()
 
+    def generate_graph(self, session):
+        _plantstats = PriceLog.get_plant_price_logs(self, session)
+        
+        # Define x-axis labels
+        t = datetime.now()
+        def x_label(diff):
+            t_diff = t - timedelta(hours=diff)
+            return t_diff.strftime("%d | %H:00")
+
+        # Define y-axis labels
+        def y_label(price):
+            return round((price / 2) * 4 / 10000, 2)
+        
+        # Graph axes
+        time_x = [x_label(diff) for diff in range(0, len(_plantstats))]
+        price_y = [y_label(log.price) for log in _plantstats]
+
+        # Clear plot and generate new graph
+        plt.clf()
+        plt.title(
+            "{0} as of {1}".format(self.tag, x_label(0)),
+            fontsize=8
+        )
+        plt.plot(time_x, price_y)
+        plt.xticks(fontsize=6, rotation=90)
+        plt.yticks(fontsize=6)
+
+        # Affix label per point
+        for x,y in zip(time_x, price_y):
+            label = "{:.2f}".format(y)
+            plt.annotate(
+                label,
+                (x,y),
+                fontsize=6,
+                textcoords="offset points",
+                xytext=(0,10),
+                ha='center'
+            )
+
+        # Save graph
+        plt.savefig(r"images\{}_graph.png".format(self.name.lower()))
+        logging.info("Successfully generated {} graph.".format(self.name))
+
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
         _plots = Plot.get_plots_count(session)
@@ -79,6 +123,8 @@ class Plant(Base):
 
         session.add(self)
         PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)
+        self.generate_graph(session)
+        
         if commit_on_execution:
             session.commit()
 
