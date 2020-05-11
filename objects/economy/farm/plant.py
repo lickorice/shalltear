@@ -99,13 +99,20 @@ class Plant(Base):
         # Demand factor calculation
         df = self.current_demand_factor
         bd, cd = self.base_demand, self.current_demand
-        market_change_percent = (cd - (bd*0.90)) / bd
-        new_demand_factor = df * 4 ** market_change_percent
-        self.current_demand_factor = new_demand_factor
+        market_change_percent = (cd - (bd*MARKET_TOLERANCE)) / bd
+
+        df_non_raw = df / 10000
+        if market_change_percent < 0:
+            # Reset the demand factor if market is saturated
+            new_demand_factor = 4 * (df_non_raw ** (MARKET_TOLERANCE + market_change_percent))
+            new_demand_factor *= 10000
+        else:
+            new_demand_factor = df * (4 ** market_change_percent)
+        self.current_demand_factor = int(new_demand_factor)
         
         # Demand calculation
         growth_rate = max(3600 / self.growing_seconds, 1)
-        _demand = self.base_harvest * growth_rate * (_plots) * (4 / (df / 10000))
+        _demand = self.base_harvest * growth_rate * (_plots) * (4 / (new_demand_factor / 10000))
         
         logging.info("Recalculated {}: {} => {}".format(self.tag, _demand, new_demand_factor / 10000))
         
