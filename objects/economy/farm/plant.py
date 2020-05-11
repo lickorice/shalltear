@@ -104,7 +104,7 @@ class Plant(Base):
         df_non_raw = df / 10000
         if market_change_percent < 0:
             # Reset the demand factor if market is saturated
-            new_demand_factor = 4 * (df_non_raw ** (MARKET_TOLERANCE + market_change_percent))
+            new_demand_factor = df_non_raw ** ((MARKET_TOLERANCE + market_change_percent) / MARKET_TOLERANCE)
             new_demand_factor *= 10000
         else:
             new_demand_factor = df * (4 ** market_change_percent)
