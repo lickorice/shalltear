@@ -31,7 +31,7 @@ class Economy(commands.Cog):
         for account in top_accounts:
             user = self.bot.get_user(account.user_id)
             user_name = "#{1} **{0.name}#{0.discriminator}**".format(user, rank)
-            gil_amount = "💵 {0:.2f} gil".format(account.get_balance())
+            gil_amount = "💵 {0:,.2f} gil".format(account.get_balance())
             embed.add_field(name=user_name, value=gil_amount, inline=False)
             rank += 1
 
