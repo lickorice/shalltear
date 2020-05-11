@@ -65,26 +65,26 @@ class Plant(Base):
         session.commit()
 
     def generate_graph(self, session):
-        _plantstats = PriceLog.get_plant_price_logs(self, session)
-        
-        # Define x-axis labels
-        t = datetime.now()
-        def x_label(diff):
-            t_diff = t - timedelta(hours=diff)
-            return t_diff.strftime("%d | %H:00")
+        time_now = datetime.now()
 
-        # Define y-axis labels
+        _plantstats = PriceLog.get_plant_price_logs(self, session)
+
+        # Define x-axis labels
+        def x_label(time):
+            return time.strftime("%d | %H:%M")
+
+        # Format y-axis labels
         def y_label(price):
             return round((price / 2) * 4 / 10000, 2)
         
         # Graph axes
-        time_x = [x_label(diff) for diff in range(0, len(_plantstats))]
+        time_x = [x_label(log.refreshed_at) for log in _plantstats]
         price_y = [y_label(log.price) for log in _plantstats]
 
         # Clear plot and generate new graph
         plt.clf()
         plt.title(
-            "{0} as of {1}".format(self.tag, x_label(0)),
+            "{0} as of {1}".format(self.tag, x_label(time_now)),
             fontsize=8
         )
         plt.plot(time_x, price_y)
@@ -134,10 +134,11 @@ class Plant(Base):
 
         session.add(self)
         PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)
-        self.generate_graph(session)
         
         if commit_on_execution:
             session.commit()
+
+        self.generate_graph(session)
 
     def set_base_price(self, session, price, raw=False):
         if not raw:

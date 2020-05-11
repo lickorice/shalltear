@@ -13,6 +13,7 @@ from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
 
+import matplotlib.pyplot as plt
 
 class Farm(commands.Cog):
     def  __init__(self, bot):
@@ -610,8 +611,11 @@ class Farm(commands.Cog):
             value="💵 `{0:,.2f}` gil/unit".format(mean_sale / 10000),
             inline=False
         )
+        
+        graph_filename = r"images\{}_graph.png".format(_plant.name.lower())
 
-        await ctx.send(embed=embed)
+        await ctx.send(embed=embed, file=discord.File(graph_filename))
+
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):
@@ -649,7 +653,6 @@ class Farm(commands.Cog):
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance(),
             plant_sell_price / 10000
         ))
-
 
 def get_growing_time_string(growing_time_in_seconds):
     growing_time = timedelta(seconds=growing_time_in_seconds)
