@@ -105,12 +105,8 @@ class Plant(Base):
                 ha='center'
             )
 
-        # Make sure graph file exists
-        graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}_graph.png".format(self.name.lower())
-        # k = open(graph_file, 'w+')
-        # k.close()
-
         # Save graph
+        graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}.png".format(self.tag.upper())
         plt.savefig(graph_file)
 
     def randomize_price(self, session, commit_on_execution=True):
