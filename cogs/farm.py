@@ -283,6 +283,7 @@ class Farm(commands.Cog):
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
+            return
 
         graph_filename = r"images\{}_graph.png".format(_plant.name.lower())
 
