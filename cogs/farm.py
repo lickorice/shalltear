@@ -388,7 +388,7 @@ class Farm(commands.Cog):
         logging.info("Reconsolidated storages of {} farms.".format(len(all_farms)))
         await ctx.send("**All farm storages reconsolidated!**")
     
-    @commands.command()
+    @commands.command(aliases=["rpp"])
     @commands.is_owner()
     async def refreshplantprices(self, ctx):
         """(Owner) Manually refresh the global market prices."""
@@ -404,6 +404,7 @@ class Farm(commands.Cog):
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
     @commands.command(aliases=["fpa"])
+    @commands.cooldown(1, 1, type=commands.BucketType.user)
     async def farmplant(self, ctx, plant_name, plant_count=1):
         """Plant a crop on a number of your available plots."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
@@ -481,6 +482,7 @@ class Farm(commands.Cog):
         await ctx.send(embed=embed)
 
     @commands.command(aliases=["fh"])
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def farmharvest(self, ctx, harvest_range=None):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
@@ -527,6 +529,8 @@ class Farm(commands.Cog):
             return
 
         # Actual harvesting
+
+        await ctx.send("Harvesting **{0.name}#{0.discriminator}**'s crops...\n".format(ctx.author))
     
         harvest_stats = {}
         has_harvest = False
@@ -553,15 +557,61 @@ class Farm(commands.Cog):
         else:
             await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
         
-
     @commands.command(aliases=["pstats", "pstat"])
+    # @commands.cooldown(1, 20, type=commands.BucketType.user)
     async def plantstats(self, ctx, plant_name):
         """Check plant price stats for the past 48 refreshes."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
             return
-        logging.info(PriceLog.get_plant_price_logs(_plant, self.bot.db_session))
+
+        mean_sale = 0
+
+        plant_stats = PriceLog.get_plant_price_logs(_plant, self.bot.db_session)
+        top_plant_stats = sorted(plant_stats, key=lambda x:x.price)
+        print(top_plant_stats)
+        plant_stats = plant_stats[::-1]
+        plant_stats = plant_stats[:24]
+        
+        for _stats in plant_stats:
+            logging.info("{0.price} / {0.refreshed_at}".format(_stats))
+            mean_sale += _stats.price
+        
+        mean_sale /= len(plant_stats)
+        
+        plant_top = PriceLog.get_highest_price(_plant, self.bot.db_session)
+
+        embed = discord.Embed(
+            title="Statistics for {0.name} `{0.tag}`".format(_plant),
+            color=0xffd700
+        )
+
+        embed.add_field(name="Yield", value="`{0.base_harvest}` units".format(_plant))
+        embed.add_field(name="Buy Price", value="💵 `{0:,.2f}` gil/unit".format(_plant.get_buy_price()))
+        embed.add_field(
+            name="Highest Recorded Sale Price",
+            value="💵 `{0:,.2f}` gil/unit\nAt `{1}`".format(
+                plant_top.price / 10000,
+                plant_top.refreshed_at.strftime("%I:%M %p - %d %B '%y")
+            ),
+            inline=False
+        )
+        embed.add_field(
+            name="Base Sale Price",
+            value="💵 `{0:,.2f}` gil/unit".format(_plant.base_sell_price / 10000),
+        )
+        embed.add_field(
+            name="Current Sale Price",
+            value="💵 `{0:,.2f}` gil/unit".format(_plant.get_sell_price()),
+        )
+        embed.add_field(
+            name="Mean Sale Price (Past 24 Hours)",
+            value="💵 `{0:,.2f}` gil/unit".format(mean_sale / 10000),
+            inline=False
+        )
+
+        await ctx.send(embed=embed)
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):

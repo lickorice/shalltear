@@ -25,7 +25,7 @@ class PriceLog(Base):
     def log_price(plant, session, commit_on_execution=True):
         new_price_log = PriceLog(
             plant_id = plant.id,
-            price = plant.current_sell_price,
+            price = plant.get_sell_price(raw=True),
             demand = plant.base_demand
         )
         session.add(new_price_log)
@@ -36,3 +36,6 @@ class PriceLog(Base):
     def get_plant_price_logs(plant, session):
         return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).all()
         
+    @staticmethod
+    def get_highest_price(plant, session):
+        return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).order_by(PriceLog.price.desc()).first()
