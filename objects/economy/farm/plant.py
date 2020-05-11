@@ -10,6 +10,7 @@ from objects.base import Base
 from objects.economy.farm.plot import Plot
 from objects.economy.farm.farm import Farm
 from objects.economy.farm.pricelog import PriceLog
+import utils.graphing as graphutils
 
 import matplotlib.pyplot as plt
 
@@ -73,48 +74,20 @@ class Plant(Base):
 
     def generate_prices_graph(self, session):
         time_now = datetime.now()
+        plant_stats_24h = self.price_logs[:24]
         
-        _plantstats = self.price_logs
-        number_of_entries = 48 if len(_plantstats) >= 48 else len(_plantstats)
-        _plantstats = _plantstats[len(_plantstats) - number_of_entries:len(_plantstats)]
-
-        # Define x-axis labels
-        def x_label(time):
-            return time.strftime("%d | %H:%M")
-
-        # Format y-axis labels
-        def y_label(price):
-            return round(price / 10000, 2)
+        x_points = [ 
+            _stat.refreshed_at.strftime("%H:%M") for _stat in plant_stats_24h
+        ]
+        y_points = [ 
+            int(_stat.price) / 10000 for _stat in plant_stats_24h
+        ]
         
-        # Graph axes
-        time_x = [x_label(log.refreshed_at) for log in _plantstats]
-        price_y = [y_label(log.price) for log in _plantstats]
-
-        # Clear plot and generate new graph
-        plt.clf()
-        plt.title(
-            "{0} as of {1}".format(self.tag, x_label(time_now)),
-            fontsize=8
-        )
-        plt.plot(time_x, price_y)
-        plt.xticks(fontsize=6, rotation=90)
-        plt.yticks(fontsize=6)
-
-        # Affix label per point
-        for x,y in zip(time_x, price_y):
-            label = "{:.2f}".format(y)
-            plt.annotate(
-                label,
-                (x,y),
-                fontsize=6,
-                textcoords="offset points",
-                xytext=(0,10),
-                ha='center'
-            )
-
-        # Save graph
         graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}.png".format(self.tag.upper())
-        plt.savefig(graph_file)
+        
+        title = "Prices"
+
+        graphutils.plot_graph(x_points, y_points, title, graph_file)
 
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
