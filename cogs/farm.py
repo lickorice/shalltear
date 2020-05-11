@@ -607,10 +607,14 @@ class Farm(commands.Cog):
             value="💵 `{0:,.2f}` gil/unit".format(mean_sale / 10000),
             inline=False
         )
+
         
         graph_file = PLANT_PRICE_GRAPH_DIRECTORY + "{}.png".format(_plant.tag.upper())
+        graph = discord.File(graph_file, filename="image.png")
+        embed.set_image(url="attachment://image.png")
 
-        await ctx.send(embed=embed, file=discord.File(graph_file))
+        await ctx.send(embed=embed, file=graph)
+        # await ctx.send(embed=embed)
 
     @commands.command(aliases=["fs"])
     async def farmsell(self, ctx, plant_name):
