@@ -4,7 +4,6 @@ from math import log10
 
 import discord, schedule
 from discord.ext import commands
-import matplotlib.pyplot as plt
 
 from config import *
 from messages.farm import *
@@ -569,19 +568,16 @@ class Farm(commands.Cog):
 
         mean_sale = 0
 
-        plant_stats = PriceLog.get_plant_price_logs(_plant, self.bot.db_session)
-        top_plant_stats = sorted(plant_stats, key=lambda x:x.price)
-        print(top_plant_stats)
-        plant_stats = plant_stats[::-1]
-        plant_stats = plant_stats[:24]
+        plant_stats_24h = _plant.price_logs
+        plant_stats_24h = plant_stats_24h[:24]
         
-        for _stats in plant_stats:
+        for _stats in plant_stats_24h:
             logging.info("{0.price} / {0.refreshed_at}".format(_stats))
             mean_sale += _stats.price
         
-        mean_sale /= len(plant_stats)
+        mean_sale /= len(plant_stats_24h)
         
-        plant_top = PriceLog.get_highest_price(_plant, self.bot.db_session)
+        plant_top = _plant.get_highest_sell_price()
 
         embed = discord.Embed(
             title="Statistics for {0.name} `{0.tag}`".format(_plant),

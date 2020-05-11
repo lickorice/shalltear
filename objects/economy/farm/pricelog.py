@@ -14,7 +14,7 @@ class PriceLog(Base):
     refreshed_at = Column(DateTime, default=datetime.now)
 
     plant_id = Column(BigInteger, ForeignKey('farm_plants.id'))
-    plant = relationship("Plant")
+    plant = relationship("Plant", back_populates="price_logs")
     price = Column(BigInteger)
     demand = Column(BigInteger)
 
@@ -31,11 +31,3 @@ class PriceLog(Base):
         session.add(new_price_log)
         if commit_on_execution:
             session.commit()
-
-    @staticmethod
-    def get_plant_price_logs(plant, session):
-        return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).all()
-        
-    @staticmethod
-    def get_highest_price(plant, session):
-        return session.query(PriceLog).filter(PriceLog.plant_id == plant.id).order_by(PriceLog.price.desc()).first()

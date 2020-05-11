@@ -3,6 +3,7 @@ from random import randint
 import logging
 
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
+from sqlalchemy.orm import relationship
 
 from config import *
 from objects.base import Base
@@ -35,6 +36,8 @@ class Plant(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+    price_logs = relationship("PriceLog", back_populates="plant")
+
     @staticmethod
     def get_plants(session):
         all_plants = session.query(Plant).order_by(Plant.buy_price).all()
@@ -59,15 +62,19 @@ class Plant(Base):
             return sell_price
         return sell_price / 10000
 
+    def get_highest_sell_price(self):
+        sorted_logs = sorted(self.price_logs, key=lambda x:x.price, reverse=True)
+        return sorted_logs[0]
+
     def decrement_demand(self, session, amount):
         self.current_demand = max(self.current_demand - amount, 0)
         session.add(self)
         session.commit()
 
-    def generate_graph(self, session):
+    def generate_prices_graph(self, session):
         time_now = datetime.now()
         
-        _plantstats = PriceLog.get_plant_price_logs(self, session)
+        _plantstats = self.price_logs
         number_of_entries = 48 if len(_plantstats) >= 48 else len(_plantstats)
         _plantstats = _plantstats[len(_plantstats) - number_of_entries:len(_plantstats)]
 
@@ -140,7 +147,7 @@ class Plant(Base):
         if commit_on_execution:
             session.commit()
 
-        self.generate_graph(session)
+        self.generate_prices_graph(session)
 
     def set_base_price(self, session, price, raw=False):
         if not raw:
