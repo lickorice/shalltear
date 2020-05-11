@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timedelta
 from random import randint
 import logging
 
@@ -10,6 +10,7 @@ from objects.economy.farm.plot import Plot
 from objects.economy.farm.farm import Farm
 from objects.economy.farm.pricelog import PriceLog
 
+import matplotlib.pyplot as plt
 
 class Plant(Base):
     __tablename__ = 'farm_plants'
@@ -63,6 +64,51 @@ class Plant(Base):
         session.add(self)
         session.commit()
 
+    def generate_graph(self, session):
+        time_now = datetime.now()
+        
+        _plantstats = PriceLog.get_plant_price_logs(self, session)
+        number_of_entries = 48 if len(_plantstats) >= 48 else len(_plantstats)
+        _plantstats = _plantstats[len(_plantstats) - number_of_entries:len(_plantstats)]
+
+        # Define x-axis labels
+        def x_label(time):
+            return time.strftime("%d | %H:%M")
+
+        # Format y-axis labels
+        def y_label(price):
+            return round(price / 10000, 2)
+        
+        # Graph axes
+        time_x = [x_label(log.refreshed_at) for log in _plantstats]
+        price_y = [y_label(log.price) for log in _plantstats]
+
+        # Clear plot and generate new graph
+        plt.clf()
+        plt.title(
+            "{0} as of {1}".format(self.tag, x_label(time_now)),
+            fontsize=8
+        )
+        plt.plot(time_x, price_y)
+        plt.xticks(fontsize=6, rotation=90)
+        plt.yticks(fontsize=6)
+
+        # Affix label per point
+        for x,y in zip(time_x, price_y):
+            label = "{:.2f}".format(y)
+            plt.annotate(
+                label,
+                (x,y),
+                fontsize=6,
+                textcoords="offset points",
+                xytext=(0,10),
+                ha='center'
+            )
+
+        # Save graph
+        plt.savefig(r"images\{}_graph.png".format(self.name.lower()))
+        logging.info("Successfully generated {} graph.".format(self.name))
+
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_farms_count(session)
         _plots = Plot.get_plots_count(session)
@@ -90,8 +136,11 @@ class Plant(Base):
 
         session.add(self)
         PriceLog.log_price(self, session, commit_on_execution=commit_on_execution)
+        
         if commit_on_execution:
             session.commit()
+
+        self.generate_graph(session)
 
     def set_base_price(self, session, price, raw=False):
         if not raw:
