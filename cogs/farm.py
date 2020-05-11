@@ -8,7 +8,7 @@ from discord.ext import commands
 from config import *
 from messages.farm import *
 from messages.core import MSG_CMD_INVALID
-from objects.economy.account import EconomyAccount
+from objects.economy.core.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.harvest import Harvest
 from objects.economy.farm.plant import Plant

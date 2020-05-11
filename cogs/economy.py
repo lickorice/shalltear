@@ -5,7 +5,7 @@ from discord.ext import commands
 
 from config import TRANSFER_TAX
 from messages.economy import *
-from objects.economy.account import EconomyAccount
+from objects.economy.core.account import EconomyAccount
 
 
 class Economy(commands.Cog):

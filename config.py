@@ -22,8 +22,8 @@ ACTIVE_COGS = [
 ]
 
 ACTIVE_OBJECTS = [
-    "objects.economy.account",
-    "objects.economy.transaction",
+    "objects.economy.core.account",
+    "objects.economy.core.transaction",
     "objects.economy.farm.farm",
     "objects.economy.farm.harvest",
     "objects.economy.farm.plot",
