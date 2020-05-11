@@ -399,7 +399,7 @@ class Farm(commands.Cog):
         for plant in all_plants:
             bp = plant.get_buy_price()
             sp = plant.get_sell_price()
-            _str = "***{0.name}*** `[B: {1:.2f} gil | S: {2:.2f} gil]`\n".format(plant, bp, sp)
+            _str = "***{0.name}*** `[B: {1:,.2f} gil | S: {2:,.2f} gil]`\n".format(plant, bp, sp)
             final_str += _str
         await ctx.send("**Prices refreshed!**\n{}".format(final_str))
 
