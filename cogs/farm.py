@@ -579,7 +579,7 @@ class Farm(commands.Cog):
         await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
         
     @commands.command(aliases=["pstats", "pstat"])
-    # @commands.cooldown(1, 60, type=commands.BucketType.user)
+    @commands.cooldown(1, 60, type=commands.BucketType.user)
     async def plantstats(self, ctx, plant_name):
         """Check plant price stats for the past 48 refreshes."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
