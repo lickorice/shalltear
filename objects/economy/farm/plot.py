@@ -1,5 +1,4 @@
 from datetime import datetime, timedelta
-import logging
 
 from sqlalchemy import Table, Column, Integer, BigInteger, String, MetaData, DateTime, ForeignKey
 from sqlalchemy.orm import relationship

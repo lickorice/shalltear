@@ -183,7 +183,6 @@ class Farm(commands.Cog):
                 color=0xffd700
             )
 
-            logging.info(paginated_plants)
             final_str = ""
             for _plant in paginated_plants[page_number-1]:
                 bp = _plant.get_buy_price()
@@ -462,7 +461,6 @@ class Farm(commands.Cog):
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         
         harvested_plants = set([i.plant for i in _farm.harvests])
-        print(_farm.harvests)
 
         id_to_plant_name = {_plant.id: _plant.name for _plant in harvested_plants}
         total_harvests = {_plant.id: 0 for _plant in harvested_plants}
@@ -562,12 +560,13 @@ class Farm(commands.Cog):
         for plant_name in harvest_stats:
             _plant = Plant.get_plant(self.bot.db_session, plant_name)
             new_harvest = Harvest(
-                plant_id=_plant.id,
+                plant=_plant,
                 amount=harvest_stats[plant_name],
-                farm_id=_farm.id
             )
 
-            self.bot.db_session.add(new_harvest)
+            _farm.harvests.append(new_harvest)
+
+            self.bot.db_session.add(_farm)
 
             harvest_str += "**{0}**, {1} units\n".format(
                 plant_name, harvest_stats[plant_name]
@@ -593,7 +592,6 @@ class Farm(commands.Cog):
         plant_stats_24h = plant_stats_24h[:24]
         
         for _stats in plant_stats_24h:
-            logging.info("{0.price} / {0.refreshed_at}".format(_stats))
             mean_sale += _stats.price
         
         mean_sale /= len(plant_stats_24h)
