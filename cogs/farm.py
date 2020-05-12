@@ -285,6 +285,16 @@ class Farm(commands.Cog):
                 ctx.author, _account.get_balance(), price / 10000
             ))
 
+    @commands.command(aliases=["rgpg"])
+    @commands.is_owner()
+    async def regenplantgraphs(self, ctx):
+        """(Owner) Regenerate plant price graphs."""
+        all_plants = Plant.get_plants(self.bot.db_session)
+        for _plant in all_plants:
+            _plant.generate_prices_graph(self.bot.db_session)
+        
+        await ctx.send("**Successfully regenerated all price graphs.**")
+    
     @commands.command()
     @commands.is_owner()
     async def setplanttag(self, ctx, plant_name, tag):
@@ -569,7 +579,7 @@ class Farm(commands.Cog):
         await ctx.send(MSG_HARVEST_SUCCESS.format(ctx.author, harvest_str))
         
     @commands.command(aliases=["pstats", "pstat"])
-    @commands.cooldown(1, 60, type=commands.BucketType.user)
+    # @commands.cooldown(1, 60, type=commands.BucketType.user)
     async def plantstats(self, ctx, plant_name):
         """Check plant price stats for the past 48 refreshes."""
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
