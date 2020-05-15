@@ -53,23 +53,7 @@ class Plot(Base):
         time_difference = harvest_datetime - datetime.now()
         if time_difference < timedelta():
             return "[HARVEST NOW]"
-        result_str = []
-        hours, rem = divmod(time_difference.seconds, 3600)
-        minutes, seconds = divmod(rem, 60)
-        first_digit = True
-        if time_difference.days:
-            result_str.append("{}d".format(time_difference.days))
-            first_digit = False
-        if not first_digit or hours:
-            result_str.append("{}h".format(hours))
-            first_digit = False
-        if not first_digit or  minutes:
-            result_str.append("{}m".format(minutes))
-            first_digit = False
-        if not first_digit or  seconds:
-            result_str.append("{}s".format(seconds))
-            first_digit = False
-        return "[{}]".format(', '.join(result_str))
+        return "[{}]".format(format_time_string(time_difference.total_seconds()))
 
     def harvest(self, session, commit_on_execution=True):
         if not self.is_harvestable():

@@ -13,6 +13,7 @@ from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.harvest import Harvest
 from objects.economy.farm.plant import Plant
 from objects.economy.farm.pricelog import PriceLog
+from utils.datetime import format_time_string
 
 
 class Farm(commands.Cog):
@@ -159,7 +160,7 @@ class Farm(commands.Cog):
             embed.add_field(
                 name="**`{0.tag}` - {0.name}**".format(_plant),
                 value=MSG_PLANT_PRICES.format(
-                  _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
+                  _plant, bp, sp, format_time_string(_plant.growing_seconds)  
                 ),
                 inline=False
             )
@@ -190,7 +191,7 @@ class Farm(commands.Cog):
                 embed.add_field(
                     name="**`{0.tag}` - {0.name}**".format(_plant),
                     value=MSG_PLANT_PRICES.format(
-                    _plant, bp, sp, get_growing_time_string(_plant.growing_seconds)  
+                    _plant, bp, sp, format_time_string(_plant.growing_seconds)  
                     ),
                     inline=False
                 )
@@ -677,21 +678,6 @@ class Farm(commands.Cog):
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance(),
             plant_sell_price / 10000
         ))
-
-def get_growing_time_string(growing_time_in_seconds):
-    growing_time = timedelta(seconds=growing_time_in_seconds)
-    result_str = []
-    hours, rem = divmod(growing_time.seconds, 3600)
-    minutes, seconds = divmod(rem, 60)
-    if growing_time.days:
-        result_str.append("{}d".format(growing_time.days))
-    if hours:
-        result_str.append("{}h".format(hours))
-    if minutes:
-        result_str.append("{}m".format(minutes))
-    if seconds:
-        result_str.append("{}s".format(seconds))
-    return ', '.join(result_str)
 
 
 def refresh_prices(bot):
