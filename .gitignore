@@ -11,5 +11,8 @@ __pycache__
 *.db
 query.sql
 
-errors.log
-runtime.log
+# Logs
+*.log
+
+# Start scripts
+*.sh
