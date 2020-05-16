@@ -32,7 +32,7 @@ class Farm(Base):
         return "<Farm id={0.id}, user_id={0.id}, plots={0.plots}>".format(self)\
 
     @staticmethod
-    def get_farms_count(session):
+    def get_all_farms_count(session):
         return session.query(Farm).count()
     
     @staticmethod

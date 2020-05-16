@@ -77,7 +77,7 @@ class Plant(Base):
         plant_stats_24h = self.price_logs[-24:]
         
         x_points = [ 
-            _stat.refreshed_at.strftime("%H:%M") for _stat in plant_stats_24h
+            _stat.refreshed_at.strftime("%d-%H:%M") for _stat in plant_stats_24h
         ]
         y_points = [ 
             int(_stat.price) / 10000 for _stat in plant_stats_24h
@@ -90,8 +90,8 @@ class Plant(Base):
         graphutils.plot_graph(x_points, y_points, title, graph_file)
 
     def randomize_price(self, session, commit_on_execution=True):
-        _farms = Farm.get_farms_count(session)
-        _plots = Plot.get_plots_count(session)
+        _farms = Farm.get_all_farms_count(session)
+        _plots = Plot.get_all_plots_count(session)
 
         # Demand factor calculation
         df = self.current_demand_factor
