@@ -26,7 +26,7 @@ class Farm(Base):
     plot_capacity = Column(Integer, default=3)
 
     harvests = relationship("Harvest", back_populates="farm", cascade="all, delete, delete-orphan")
-    plots = relationship("Plot", back_populates="farm")
+    plots = relationship("Plot", back_populates="farm", cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return "<Farm id={0.id}, user_id={0.id}, plots={0.plots}>".format(self)\

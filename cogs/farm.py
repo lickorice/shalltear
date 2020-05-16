@@ -341,8 +341,8 @@ class Farm(commands.Cog):
     async def trashplots(self, ctx):
         """Discard the plants on all your plots. No refunds."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        for _plot in _farm.plots:
-            del _plot
+        for i in range(len(_farm.plots)):
+            del _farm.plots[i]
         await ctx.send(MSG_DISCARD_ALL.format(ctx.author))
     
     @commands.command()
@@ -455,43 +455,18 @@ class Farm(commands.Cog):
 
     @commands.command(aliases=["fh"])
     @commands.cooldown(1, 20, type=commands.BucketType.user)
-    async def farmharvest(self, ctx, harvest_range=None):
+    async def farmharvest(self, ctx, options=None):
         """Harvest all your harvestable crops."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         plot_count = len(_farm.plots)
 
         all_plots = False
 
-        if harvest_range is not None:
-            try:
-                harvest_range = list(map(int, harvest_range.split('-')))  
-            except ValueError:
-                await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-                return
-        else:
-            all_plots = True
-            harvest_range = [1, plot_count]
-        
-        # Command validation:
-        if len(harvest_range) > 2:
-            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-            return
-        
-        if len(harvest_range) == 1:
-            harvest_range.append(harvest_range[0])
-
-        if harvest_range[1] < harvest_range[0]:
-            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-            return
-        
-        if not (0 <= harvest_range[0]-1 < plot_count) or not (0 <= harvest_range[1]-1 < plot_count):
-            await ctx.send(MSG_DISCARD_OUT_OF_RANGE.format(ctx.author))
-            return
-
         storage_needed = 0
-        for i in range(harvest_range[0]-1, harvest_range[1]):
-            storage_needed += _farm.plots[i].get_harvest_amount()
+        for _plot in _farm.plots:
+            storage_needed += _plot.get_harvest_amount()
 
+        # Storage validation
         if not _farm.has_storage(storage_needed):
             await ctx.send(MSG_HARVEST_NOT_ENOUGH_CAPACITY.format(
                 ctx.author,
@@ -499,7 +474,6 @@ class Farm(commands.Cog):
                 storage_needed
             ))
             return
-
         if storage_needed == 0:
             await ctx.send(MSG_HARVEST_NONE.format(ctx.author))
             return
@@ -509,7 +483,7 @@ class Farm(commands.Cog):
 
         # Collect harvesting info
         harvest_stats = {}
-        for i in range(harvest_range[0]-1, harvest_range[1]):
+        for i in range(len(_farm.plots))[::-1]:
             _harvest = _farm.plots[i].harvest(self.bot.db_session, commit_on_execution=False)
             if _harvest is None:
                 continue
@@ -517,6 +491,9 @@ class Farm(commands.Cog):
             if _harvest.plant.name not in harvest_stats:
                 harvest_stats[_harvest.plant.name] = 0
             harvest_stats[_harvest.plant.name] += _harvest.amount
+
+            if _harvest.delete_plot:
+                del _farm.plots[i]
 
         # Collate harvest info
         harvest_str = ""
