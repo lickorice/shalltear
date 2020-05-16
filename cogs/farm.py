@@ -338,56 +338,12 @@ class Farm(commands.Cog):
         await ctx.send("**{0.mention}'s plots have been purged.**".format(target))
     
     @commands.command()
-    async def trashplots(self, ctx, scrap_range=None):
-        """Discard the plants on your plots. No refunds.
-        Scrap range can be:
-        - a number, to scrap that single plot
-        - a range (1-4, 5-7, etc.) with NO SPACES to scrap those plots, the numbers included
-        You can also choose to leave the scrap_range blank, to scrap ALL your plots.
-        """
+    async def trashplots(self, ctx):
+        """Discard the plants on all your plots. No refunds."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        plot_count = len(_farm.plots)
-
-        all_plots = False
-
-        if scrap_range is not None:
-            try:
-                scrap_range = list(map(int, scrap_range.split('-')))  
-            except ValueError:
-                await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-                return
-        else:
-            all_plots = True
-            scrap_range = [1, plot_count]
-        
-        # Command validation:
-        if len(scrap_range) > 2:
-            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-            return
-        
-        if len(scrap_range) == 1:
-            scrap_range.append(scrap_range[0])
-
-        if scrap_range[1] < scrap_range[0]:
-            await ctx.send(MSG_CMD_INVALID.format(ctx.author))
-            return
-        
-        if not (0 <= scrap_range[0]-1 < plot_count) or not (0 <= scrap_range[1]-1 < plot_count):
-            await ctx.send(MSG_DISCARD_OUT_OF_RANGE.format(ctx.author))
-            return
-        
-        for i in range(scrap_range[0]-1, scrap_range[1]):
-            _farm.plots[i].plant = None
-            _farm.plots[i].planted_at = None
-            self.bot.db_session.add(_farm.plots[i])
-        self.bot.db_session.commit()
-
-        if all_plots:
-            await ctx.send(MSG_DISCARD_ALL.format(ctx.author))
-        elif scrap_range[0] == scrap_range[1]:
-            await ctx.send(MSG_DISCARD_SINGLE.format(ctx.author, scrap_range))
-        else:
-            await ctx.send(MSG_DISCARD_RANGE.format(ctx.author, scrap_range))
+        for _plot in _farm.plots:
+            del _plot
+        await ctx.send(MSG_DISCARD_ALL.format(ctx.author))
     
     @commands.command()
     @commands.is_owner()
@@ -423,24 +379,27 @@ class Farm(commands.Cog):
     @commands.cooldown(1, 1, type=commands.BucketType.user)
     async def farmplant(self, ctx, plant_name, plant_count=1):
         """Plant a crop on a number of your available plots."""
+        # Plant validation
         _plant = Plant.get_plant(self.bot.db_session, plant_name)
         if _plant is None:
             await ctx.send(MSG_PLANT_NOT_FOUND.format(ctx.author))
             return
+        
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
         _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
         
+        free_plots = _farm.get_free_plot_count()
+        plant_count = min(plant_count, free_plots)
         total_price = _plant.buy_price * plant_count
         
+        # Balance validation
         if not _account.has_balance(total_price, raw=True):
             await ctx.send(MSG_INSUFFICIENT_FUNDS.format(ctx.author, _account.get_balance()))
             return
-        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        _plots = _farm.get_available_plots(self.bot.db_session)
-        if len(_plots) == None:
+        
+        # Plot capacity validation
+        if free_plots == 0:
             await ctx.send(MSG_PLOT_NOT_FOUND.format(ctx.author))
-            return
-        if len(_plots) < plant_count:
-            await ctx.send(MSG_PLANT_NO_PLOTS.format(ctx.author, len(_plots), plant_count))
             return
 
         _account.add_debit(
@@ -449,9 +408,7 @@ class Farm(commands.Cog):
             raw=True,
         )
 
-        for _plot in _plots[:plant_count]:
-            _plot.plant_to_plot(_plant, self.bot.db_session, commit_on_execution=False)
-        self.bot.db_session.commit()
+        _farm.plant_crop(_plant, self.bot.db_session, plot_range=plant_count)
 
         await ctx.send(
             MSG_PLOT_PLANT.format(
