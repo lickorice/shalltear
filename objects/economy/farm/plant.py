@@ -91,7 +91,7 @@ class Plant(Base):
 
     def randomize_price(self, session, commit_on_execution=True):
         _farms = Farm.get_all_farms_count(session)
-        _plots = Plot.get_all_plots_count(session)
+        total_plot_capacity = Farm.get_all_farms_plot_capacity(session)
 
         # Demand factor calculation
         df = self.current_demand_factor
@@ -109,7 +109,7 @@ class Plant(Base):
         
         # Demand calculation
         growth_rate = max(3600 / self.growing_seconds, 1)
-        _demand = self.base_harvest * growth_rate * (_plots) * (4 / (new_demand_factor / 10000))
+        _demand = self.base_harvest * growth_rate * (total_plot_capacity) * (4 / (new_demand_factor / 10000))
         
         logging.info("Recalculated {}: {} => {}".format(self.tag, _demand, new_demand_factor / 10000))
         

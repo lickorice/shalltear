@@ -36,6 +36,10 @@ class Farm(Base):
         return session.query(Farm).count()
     
     @staticmethod
+    def get_all_farms_plot_capacity(session):
+        return sum([_farm.plot_capacity for _farm in Farm.get_all_farms(session)])
+    
+    @staticmethod
     def get_top_farms(session, number=10):
         all_farms = session.query(Farm).all()
         all_farms = sorted(all_farms, key=lambda x:len(x.plots), reverse=True)
