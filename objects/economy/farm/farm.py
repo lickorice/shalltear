@@ -23,6 +23,8 @@ class Farm(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
+    plot_capacity = Column(Integer, default=3)
+
     harvests = relationship("Harvest", back_populates="farm", cascade="all, delete, delete-orphan")
     plots = relationship("Plot", back_populates="farm")
 
@@ -49,9 +51,6 @@ class Farm(Base):
         new_farm = Farm(
             user_id = user_id,
         )
-        new_farm.plots = [
-            Plot(), Plot(), Plot() # Default 3 plots
-        ]
         session.add(new_farm)
         session.commit()
         return new_farm
@@ -71,15 +70,17 @@ class Farm(Base):
             self.bot.db_session.commit()
         return self.name
 
-    def get_all_plots(self, session):
+    def get_all_plots(self):
         return self.plots
 
-    def get_available_plots(self, session):
-        results = [i for i in self.plots if i.plant is None]
-        return results
+    def get_used_plot_count(self):
+        return sum(_plot.plot_range for _plot in self.plots)
+
+    def get_free_plot_count(self):
+        return self.plot_capacity - self.get_used_plot_count()
 
     def get_plot_count(self):
-        return len(self.plots)
+        return self.plot_capacity
 
     def get_next_plot_price(self, raw=False, up_count=1):
         plot_count = self.get_plot_count() - 2
@@ -117,6 +118,25 @@ class Farm(Base):
         session.commit()
 
     def add_plot(self, session, up_count=1):
-        self.plots += [Plot() for i in range(up_count)]
+        self.plot_capacity += up_count
         session.add(self)
         session.commit()
+
+    def has_plots(self, plot_range):
+        return plot_range <= self.get_free_plot_count()
+
+    def plant_crop(self, _plant, session, plot_range=1, commit_on_execution=True):
+        if not self.has_plots(plot_range):
+            raise Exception("Plot capacity not enough. {0} => {1}".format(
+                plot_range, self.get_free_plot_count()
+            ))
+        new_plot = Plot(
+            plant_id=_plant.id,
+            planted_at=datetime.now(),
+            plot_range=plot_range
+        )
+        self.plots.append(new_plot)
+        session.add(self)
+        if commit_on_execution:
+            session.commit()
+

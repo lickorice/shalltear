@@ -5,6 +5,7 @@ from sqlalchemy.orm import relationship
 
 from objects.base import Base
 from objects.economy.farm.harvest import Harvest
+from utils.datetime import format_time_string
 
 
 class Plot(Base):
@@ -23,24 +24,19 @@ class Plot(Base):
 
     planted_at = Column(DateTime, default=None)
 
+    plot_range = Column(Integer, default=1)
+
     def __repr__(self):
         return "<Plot plant={0.plant}, planted_at={0.planted_at}>".format(self)
 
     @staticmethod
-    def get_plots_count(session):
-        return session.query(Plot).count()
-
-    def plant_to_plot(self, _plant, session, commit_on_execution=True):
-        self.plant = _plant
-        self.planted_at = datetime.now()
-        session.add(self)
-        if commit_on_execution:
-            session.commit()
+    def get_all_plots_count(session):
+        return sum(_plot.plot_range for _plot in session.query(Plot).all())
     
     def get_status_str(self):
-        if self.plant is None:
-            return "-- EMPTY --"
-        return "{0} -- {1}".format(self.plant.tag, self.get_remaining_harvest_time())
+        return "[{0:04d}] {1} -- {2}".format(
+            self.plot_range, self.plant.tag, self.get_remaining_harvest_time()
+        )
 
     def is_harvestable(self):
         if self.plant is None: return False
@@ -55,22 +51,28 @@ class Plot(Base):
             return "[HARVEST NOW]"
         return "[{}]".format(format_time_string(time_difference.total_seconds()))
 
-    def harvest(self, session, commit_on_execution=True):
-        if not self.is_harvestable():
+    def harvest(self, session, target_range=-1, force=False, commit_on_execution=True):
+        if not force and not self.is_harvestable():
             return None
+
+        target_range = min(target_range, self.plot_range)
+        harvest_amount = self.plant.base_harvest
+        if target_range == -1: # -1 = Harvest all
+            harvest_amount *= self.plot_range
+            self.plot_range = 0
+        else:
+            harvest_amount *= target_range
+            self.plot_range -= target_range
 
         # Pass to an information wrapper
         harvest_info = HarvestInfo(
             plant=self.plant,
-            amount=self.plant.base_harvest
+            amount=harvest_amount,
+            delete_plot=True if self.plot_range == 0 else False
         )
 
         # Increment storage space used
-        self.farm.current_harvest += self.get_harvest_amount()
-
-        # Remove crop planted
-        self.plant = None
-        self.planted_at = None
+        self.farm.current_harvest += harvest_amount
 
         # Database actions
         session.add(self)
@@ -81,13 +83,18 @@ class Plot(Base):
 
         return harvest_info
 
-    def get_harvest_amount(self):
+    def get_harvest_amount(self, target_range=-1):
         if not self.is_harvestable():
             return 0
-        return self.plant.base_harvest
+        target_range = min(target_range, self.plot_range)
+        if target_range == -1:
+            return self.plant.base_harvest * self.plot_range
+        else:
+            return self.plant.base_harvest * target_range
 
 
 class HarvestInfo:
-    def __init__(self, plant, amount):
+    def __init__(self, plant, amount, delete_plot=False):
         self.plant = plant
         self.amount = amount
+        self.delete_plot = delete_plot

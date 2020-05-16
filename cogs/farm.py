@@ -35,7 +35,7 @@ class Farm(commands.Cog):
         )
 
         embed.add_field(name="Plots", value="{0} / {1}".format(
-            len(_farm.plots), FARM_PLOTS_MAX
+            _farm.get_plot_count(), FARM_PLOTS_MAX,
         ))
         embed.add_field(
             name="Storage", 
@@ -96,7 +96,7 @@ class Farm(commands.Cog):
     async def farmplots(self, ctx, page_number: int=1):
         """Show the details of your plots."""
         _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
-        _plots = _farm.get_all_plots(self.bot.db_session)
+        _plots = _farm.plots
 
         plot_count = len(_plots)
 
@@ -104,11 +104,16 @@ class Farm(commands.Cog):
             _plots[i:i+20] for i in range(0, plot_count, 20)
         ]
 
+        if len(paginated_plots) == 0:
+            paginated_plots = [[]]
+
         # Make sure page number is in bounds
         page_number = min(page_number, len(paginated_plots))
         page_number = max(page_number, 1)
         
-        plot_str = ""
+        plot_str = "You have {} plots free out of {} total.\n".format(
+            _farm.get_free_plot_count(), _farm.get_plot_count()
+        )
         plot_count = 1 + (20 * (page_number-1))
         for _plot in paginated_plots[page_number-1]:
             plot_str += "Plot #{0:04d}: {1}\n".format(plot_count, _plot.get_status_str())

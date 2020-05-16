@@ -8,7 +8,7 @@ secrets.json
 __pycache__
 
 # SQLite Database
-data.db
+*.db
 query.sql
 
 errors.log
