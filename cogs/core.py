@@ -28,8 +28,23 @@ class Core(commands.Cog):
         """Show target's profile."""
         if target is None:
             target = ctx.author
+
         _profile = Profile.get_profile(target, self.bot.db_session)
-        await ctx.send(_profile)
+        embed = discord.Embed(
+            title="{0.name}#{0.discriminator}'s Profile".format(target),
+            color=target.color,
+        )
+
+        embed.set_thumbnail(url=target.avatar_url)
+
+        embed.add_field(name="Experience", value="**{0}** ({1} to next level)".format(
+            _profile.experience, _profile.to_next - _profile.experience
+        ), inline=False)
+        embed.add_field(name="Materia", value="**💎 {0}**".format(_profile.meme_stars))
+        embed.add_field(name="Stars", value="**🌟 {0}**".format(_profile.meme_stars))
+        embed.add_field(name="Farm Prestige", value="**{0}**".format(_profile.farm_prestige))
+
+        await ctx.send(embed=embed)
 
     
     @commands.command()
