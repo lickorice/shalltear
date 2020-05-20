@@ -6,6 +6,7 @@ from sqlalchemy.orm import relationship
 
 from config import *
 from objects.base import Base
+from objects.core.profile import Profile
 from objects.economy.farm.plot import Plot
 
 
@@ -41,9 +42,17 @@ class Farm(Base):
     
     @staticmethod
     def get_top_farms(session, number=10):
-        all_farms = session.query(Farm).all()
-        all_farms = sorted(all_farms, key=lambda x:len(x.plots), reverse=True)
-        return all_farms[:number]
+        top_profiles = session.query(Profile).order_by(Profile.farm_prestige.desc()).all()[:number]
+        top_profiles_farms = {_profile.user_id: Farm.get_farm(_profile.user_id, session, use_id=True) for _profile in top_profiles}
+
+        def sorter(x):
+            return (x.farm_prestige, top_profiles_farms[x.user_id].plot_capacity)
+
+        top_farms = [
+            top_profiles_farms[_p.user_id] for _p in sorted(top_profiles, key=sorter, reverse=True)
+        ]
+
+        return top_farms
     
     @staticmethod
     def get_all_farms(session):
@@ -60,8 +69,11 @@ class Farm(Base):
         return new_farm
 
     @staticmethod
-    def get_farm(user, session):
-        user_id = user.id
+    def get_farm(user, session, use_id=False):
+        if use_id:
+            user_id = user
+        else:
+            user_id = user.id
         result = session.query(Farm).filter_by(user_id=user_id).first()
         if result is None:
             return Farm.create_farm(user, session)

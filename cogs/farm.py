@@ -53,15 +53,26 @@ class Farm(commands.Cog):
         embed = discord.Embed(title="Top 10 Most Bountiful Farms", color=0xffd700)
         rank = 1
         for _farm in top_farms:
-            plot_count = len(_farm.plots)
-            leaf_count = int(log10(plot_count))+1
+            _farm.plot_capacity
             user = self.bot.get_user(_farm.user_id)
+            _profile = Profile.get_profile(user, self.bot.db_session)
             try:
                 row_name = "#{1} **{2}** - ({0.name}#{0.discriminator})".format(user, rank, _farm.get_name(self.bot.db_session))
             except AttributeError:
                 row_name = "#{1} **{2}** - ({0})".format("Unknown User", rank, _farm.get_name(self.bot.db_session))
-            plot_count = "🌱"*leaf_count + " {0} Plots".format(len(_farm.plots))
-            embed.add_field(name=row_name, value=plot_count, inline=False)
+            
+            if rank == 1:
+                rank_details = "🌟 "
+            elif rank <= 5:
+                rank_details = "⭐ "
+            else:
+                rank_details = ""
+            
+            if _profile.farm_prestige == 0:
+                rank_details += "{0} Plots".format(_farm.plot_capacity)
+            else:
+                rank_details += "**Prestige Level {1}** - {0} Plots".format(_farm.plot_capacity, _profile.farm_prestige)
+            embed.add_field(name=row_name, value=rank_details, inline=False)
             rank += 1
 
         await ctx.send(embed=embed)

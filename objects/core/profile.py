@@ -39,8 +39,11 @@ class Profile(Base):
         return session.query(Profile).order_by(Profile.level.desc()).all()[:number]
 
     @staticmethod
-    def get_profile(user, session, create_if_not_exists=True):
-        user_id = user.id
+    def get_profile(user, session, create_if_not_exists=True, use_id=False):
+        if use_id:
+            user_id = user
+        else:
+            user_id = user.id
         result = session.query(Profile).filter_by(user_id=user_id).first()
         if result is None and create_if_not_exists:
             return Profile.create_profile(user, session, not user.bot)
