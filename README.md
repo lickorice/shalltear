@@ -24,6 +24,8 @@ $ python3 run.py
 
 ## Changelog
 ### `v0.1.0b` (Items and Auction Update)
+- Add command `s!declarebankruptcy` which would reset your current farm instance and gil balance (in case of farm failure).
+- Plot system fully revamped and optimized.
 - Miscellaneous administration tools:
     - Add manual backup command of the database.
     - Add automated midnight backup routine of the database.

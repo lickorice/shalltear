@@ -20,7 +20,7 @@ class EconomyAccount(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    transactions = relationship("EconomyTransaction", back_populates="account")
+    transactions = relationship("EconomyTransaction", back_populates="account", cascade="all, delete, delete-orphan")
 
     def __repr__(self):
         return "<User id={0.id}, enabled={0.enabled}, balance={0.balance}>".format(self)

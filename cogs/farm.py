@@ -1,4 +1,4 @@
-import logging
+import logging, asyncio, string, random
 from datetime import timedelta, datetime
 from math import log10
 
@@ -618,6 +618,32 @@ class Farm(commands.Cog):
             plant_sell_price / 10000
         ))
 
+    @commands.command()
+    async def declarebankruptcy(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+
+        def is_author(m):
+            return m.author == ctx.author
+
+        confirmation = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        await ctx.send("{0.mention}, please send `{1}` to confirm bankruptcy.".format(
+            ctx.author, confirmation
+        ))
+
+        try:
+            msg = await self.bot.wait_for("message", check=is_author, timeout=60.0)
+        except asyncio.TimeoutError:
+            await ctx.send("**{0.mention}, your confirmation timed out.**".format(ctx.author))
+            return
+        if msg.content != confirmation:
+            await ctx.send("**{0.mention}, your confirmation did not match.**".format(ctx.author))
+            return
+
+        await ctx.send("**{0.mention}, you have now declared your bankruptcy.**".format(ctx.author))
+        self.bot.db_session.delete(_farm)
+        self.bot.db_session.delete(_account)
+        self.bot.db_session.commit()
 
 def refresh_prices(bot):
     logging.info("Refreshing farm market prices...")
