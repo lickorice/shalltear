@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 from sqlalchemy.orm import relationship
 
-from config import BASE_EXPERIENCE
+from config import BASE_EXPERIENCE, EXP_FACTOR
 from objects.base import Base
 
 class Profile(Base):
@@ -24,11 +24,12 @@ class Profile(Base):
     created_at = Column(DateTime, default=datetime.now)
     updated_at = Column(DateTime, default=datetime.now, onupdate=datetime.now)
 
-    # Prestige Levels
+    # Specialization Levels
     farm_prestige = Column(Integer, default=0)
+    meme_stars = Column(Integer, default=0)
 
     def __repr__(self):
-        return "<Profile user_id={0.user_id}, level={0.level}, materia={0.materia}>".format(self)
+        return "<Profile user_id={0.user_id}, level={0.level}, exp={0.experience}, to_next={0.to_next}, materia={0.materia}>".format(self)
 
     @staticmethod
     def get_all_profiles(session):
@@ -60,6 +61,24 @@ class Profile(Base):
         if commit_on_execution:
             session.commit()
         return new_profile
+
+    def level_up(self):
+        self.level += 1
+        self.experience = self.experience - self.to_next
+        self.to_next = int(BASE_EXPERIENCE * (self.level ** EXP_FACTOR))
+
+    def process_xp(self, exp_amount, session, commit_on_execution=True):
+        self.experience += exp_amount
+        leveled_up = False
+        if self.experience >= self.to_next:
+            self.level_up()
+            leveled_up = True
+
+        session.add(self)
+        if commit_on_execution:
+            session.commit()
+
+        return leveled_up
 
     def apply_farm_prestige(self, session, raw_gil, commit_on_execution=True):
         new_materia = int(raw_gil / 1000000000000)

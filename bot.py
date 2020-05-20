@@ -1,4 +1,4 @@
-import logging
+import logging, asyncio
 
 import discord, schedule
 from discord.ext import commands
@@ -6,7 +6,8 @@ from discord.ext import commands
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 
-from config import COMMAND_PREFIX
+from config import COMMAND_PREFIX, EXP_PER_MESSAGE
+from objects.core.profile import Profile
 
 
 class BotCore(commands.AutoShardedBot):
@@ -21,8 +22,22 @@ class BotCore(commands.AutoShardedBot):
         logging.info("Using discord.py version {}".format(discord.__version__))
 
     async def on_message(self, message):
+        if message.author.bot:
+            return
+
         logging.debug("Message from {0.author}: {0.content}".format(message))
         schedule.run_pending()
+
+        leveled_up = False
+        _profile = Profile.get_profile(message.author, self.db_session)
+        if not message.content.startswith("s!"):
+            leveled_up = _profile.process_xp(EXP_PER_MESSAGE, self.db_session)
+
+        if leveled_up:
+            message = await message.channel.send("**{0.mention}, you have leveled up!** You are now **Level {1}**." .format(
+                message.author, _profile.level
+            ))
+            await message.delete(delay=5)
 
         await self.process_commands(message)
 
