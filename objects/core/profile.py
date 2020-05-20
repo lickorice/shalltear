@@ -6,7 +6,7 @@ import logging
 from sqlalchemy import Table, Column, Boolean, Integer, BigInteger, String, MetaData, DateTime
 from sqlalchemy.orm import relationship
 
-from config import BASE_EXPERIENCE, EXP_FACTOR
+from config import BASE_EXPERIENCE, EXP_FACTOR, LEVEL_UP_MATERIA_REWARD
 from objects.base import Base
 
 class Profile(Base):
@@ -66,6 +66,7 @@ class Profile(Base):
         self.level += 1
         self.experience = self.experience - self.to_next
         self.to_next = int(BASE_EXPERIENCE * (self.level ** EXP_FACTOR))
+        self.materia += LEVEL_UP_MATERIA_REWARD
 
     def process_xp(self, exp_amount, session, commit_on_execution=True):
         self.experience += exp_amount
