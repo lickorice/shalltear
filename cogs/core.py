@@ -5,8 +5,9 @@ from time import time
 import discord
 from discord.ext import commands
 
+import config
 from messages.core import *
-from config import CURRENT_VERSION
+from objects.core.profile import Profile
 
 start_time = time()
 
@@ -20,6 +21,15 @@ class Core(commands.Cog):
         """Tests responsiveness."""
         latency_in_ms = "{} ms".format(int(self.bot.latency * 1000))
         await ctx.send(CMD_PING.format(latency_in_ms))
+
+    @commands.cooldown(1, 20, type=commands.BucketType.user)
+    @commands.command(aliases=['p'])
+    async def profile(self, ctx, target: discord.Member=None):
+        """Show target's profile."""
+        if target is None:
+            target = ctx.author
+        _profile = Profile.get_profile(target, self.bot.db_session)
+        await ctx.send(_profile)
 
     
     @commands.command()

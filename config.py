@@ -23,6 +23,7 @@ ACTIVE_COGS = [
 ]
 
 ACTIVE_OBJECTS = [
+    "objects.core.profile",
     "objects.economy.core.account",
     "objects.economy.core.transaction",
     "objects.economy.farm.farm",
@@ -34,6 +35,10 @@ ACTIVE_OBJECTS = [
 ACTIVE_SEEDERS = [
     "objects.economy.farm.seeders.plant",
 ]
+
+# Core
+BASE_EXPERIENCE = 200
+EXP_FACTOR = 1.5
 
 # Economy
 TRANSFER_TAX = 0.01
