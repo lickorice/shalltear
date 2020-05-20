@@ -28,7 +28,7 @@ class Profile(Base):
     farm_prestige = Column(Integer, default=0)
 
     def __repr__(self):
-        return "<Profile user_id={0.user_id}, level={0.level}>".format(self)
+        return "<Profile user_id={0.user_id}, level={0.level}, materia={0.materia}>".format(self)
 
     @staticmethod
     def get_all_profiles(session):
@@ -57,3 +57,12 @@ class Profile(Base):
         if commit_on_execution:
             session.commit()
         return new_profile
+
+    def apply_farm_prestige(self, session, raw_gil, commit_on_execution=True):
+        new_materia = int(raw_gil / 1000000000000)
+        self.materia += new_materia
+        self.farm_prestige += 1
+        session.add(self)
+        if commit_on_execution:
+            session.commit()
+        return new_materia

@@ -62,7 +62,9 @@ class EconomyAccount(Base):
             amount *= 10000
         return amount <= self.balance
 
-    def get_balance(self):
+    def get_balance(self, raw=False):
+        if raw:
+            return self.balance
         return self.balance / 10000 # Convert to database-friendly format
 
     def reconsolidate_balance(self, session, commit_on_execution=True):

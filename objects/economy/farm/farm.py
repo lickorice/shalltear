@@ -144,3 +144,6 @@ class Farm(Base):
         if commit_on_execution:
             session.commit()
 
+    def can_prestige(self):
+        return self.plot_capacity == FARM_PLOTS_MAX
+

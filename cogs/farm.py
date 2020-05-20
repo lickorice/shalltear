@@ -8,6 +8,7 @@ from discord.ext import commands
 from config import *
 from messages.farm import *
 from messages.core import MSG_CMD_INVALID
+from objects.core.profile import Profile
 from objects.economy.core.account import EconomyAccount
 from objects.economy.farm.farm import Farm as ORMFarm
 from objects.economy.farm.harvest import Harvest
@@ -616,6 +617,44 @@ class Farm(commands.Cog):
         await ctx.send(MSG_SELL_SUCCESS.format(
             ctx.author, total_amount, _plant, raw_credit / 10000, _account.get_balance(),
             plant_sell_price / 10000
+        ))
+
+    @commands.command(aliases=["fprestige", "fpr"])
+    async def farmprestige(self, ctx):
+        _farm = ORMFarm.get_farm(ctx.author, self.bot.db_session)
+        _account = EconomyAccount.get_economy_account(ctx.author, self.bot.db_session)
+        _profile = Profile.get_profile(ctx.author, self.bot.db_session)
+
+        def is_author(m):
+            return m.author == ctx.author
+
+        if not _farm.can_prestige():
+            await ctx.send("**{0.mention}, you have to reach maximum plot capacity before doing a prestige reset.**".format(
+                ctx.author
+            ))
+            return
+
+        confirmation = ''.join(random.choices(string.ascii_uppercase + string.digits, k=8))
+        await ctx.send("{0.mention}, please send `{1}` to confirm your prestige reset.".format(
+            ctx.author, confirmation
+        ))
+
+        try:
+            msg = await self.bot.wait_for("message", check=is_author, timeout=60.0)
+        except asyncio.TimeoutError:
+            await ctx.send("**{0.mention}, your confirmation timed out.**".format(ctx.author))
+            return
+        if msg.content != confirmation:
+            await ctx.send("**{0.mention}, your confirmation did not match.**".format(ctx.author))
+            return
+
+        materia_diff = _profile.apply_farm_prestige(self.bot.db_session, _account.get_balance(raw=True))
+        self.bot.db_session.delete(_farm)
+        self.bot.db_session.delete(_account)
+        self.bot.db_session.commit()
+
+        await ctx.send("**{0.mention}, you have now reset your farm.** You are now **Farm Prestige level {1}**, and gained **{2} 💎 Materia**.".format(
+            ctx.author, _profile.farm_prestige, materia_diff
         ))
 
     @commands.command()
