@@ -38,6 +38,7 @@ class Core(commands.Cog):
 
         embed.set_thumbnail(url=target.avatar_url)
 
+        embed.add_field(name="Level", value="**{0}**".format(_profile.level))
         embed.add_field(name="Experience", value="**{0}** ({1} to next level)".format(
             _profile.experience, _profile.to_next - _profile.experience
         ), inline=False)

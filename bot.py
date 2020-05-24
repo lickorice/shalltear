@@ -8,6 +8,7 @@ from sqlalchemy.orm import sessionmaker
 
 from config import COMMAND_PREFIX, EXP_PER_MESSAGE
 from objects.core.profile import Profile
+from roles import *
 
 
 class BotCore(commands.AutoShardedBot):
@@ -28,16 +29,29 @@ class BotCore(commands.AutoShardedBot):
         logging.debug("Message from {0.author}: {0.content}".format(message))
         schedule.run_pending()
 
-        leveled_up = False
+        leveled_up = None
         _profile = Profile.get_profile(message.author, self.db_session)
-        if not message.content.startswith("s!"):
+        if not message.content.startswith(COMMAND_PREFIX):
             leveled_up = _profile.process_xp(EXP_PER_MESSAGE, self.db_session)
 
-        if leveled_up:
-            message = await message.channel.send("**{0.mention}, you have leveled up!** You are now **Level {1}**." .format(
+        if leveled_up is not None:
+            _msg = await message.channel.send("**{0.mention}, you have leveled up!** You are now **Level {1}**." .format(
                 message.author, _profile.level
             ))
-            await message.delete(delay=5)
+            await _msg.delete(delay=5)
+            
+            if leveled_up != 2:
+                all_leveled_roles = [
+                    message.channel.guild.get_role(LEVELED_ROLES[_r][0]) for _r in LEVELED_ROLES
+                ]
+                await message.author.remove_roles(*all_leveled_roles)
+                _msg = await message.channel.send("{0.mention}, you have reached the rank of **{1}!**" .format(
+                    message.author, leveled_up[1]
+                ))
+                _role = message.channel.guild.get_role(leveled_up[0])
+                await message.author.add_roles(_role)
+                await _msg.delete(delay=5)
+
 
         await self.process_commands(message)
 

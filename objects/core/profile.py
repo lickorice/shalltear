@@ -8,6 +8,7 @@ from sqlalchemy.orm import relationship
 
 from config import BASE_EXPERIENCE, EXP_FACTOR, LEVEL_UP_MATERIA_REWARD
 from objects.base import Base
+from roles import *
 
 class Profile(Base):
     __tablename__ = 'core_profiles'
@@ -62,24 +63,38 @@ class Profile(Base):
             session.commit()
         return new_profile
 
+    def get_top_leveled_role(self):
+        all_levels = sorted(LEVELED_ROLES.keys()) # Unpack as keys
+        # It's ok to do linear search here, <20 roles anyway
+        print(all_levels)
+        for i in range(len(all_levels)):
+            print(all_levels[i])
+            if self.level < all_levels[i]:
+                return LEVELED_ROLES[all_levels[i-1]][0] # 0 returns id, 1 is title
+        return LEVELED_ROLES[all_levels[-1]][0]
+
     def level_up(self):
         self.level += 1
-        self.experience = self.experience - self.to_next
+        self.experience = max(self.experience - self.to_next, 0)
         self.to_next = int(BASE_EXPERIENCE * (self.level ** EXP_FACTOR))
         self.materia += LEVEL_UP_MATERIA_REWARD
+        
+        if self.level in LEVELED_ROLES:
+            return LEVELED_ROLES[self.level]
+        else:
+            return 2
 
     def process_xp(self, exp_amount, session, commit_on_execution=True):
         self.experience += exp_amount
-        leveled_up = False
+        result = None
         if self.experience >= self.to_next:
-            self.level_up()
-            leveled_up = True
+            result = self.level_up()
 
         session.add(self)
         if commit_on_execution:
             session.commit()
 
-        return leveled_up
+        return result
 
     def apply_farm_prestige(self, session, raw_gil, commit_on_execution=True):
         new_materia = int(raw_gil / 1000000000000)
