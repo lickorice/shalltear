@@ -66,9 +66,7 @@ class Profile(Base):
     def get_top_leveled_role(self):
         all_levels = sorted(LEVELED_ROLES.keys()) # Unpack as keys
         # It's ok to do linear search here, <20 roles anyway
-        print(all_levels)
         for i in range(len(all_levels)):
-            print(all_levels[i])
             if self.level < all_levels[i]:
                 return LEVELED_ROLES[all_levels[i-1]][0] # 0 returns id, 1 is title
         return LEVELED_ROLES[all_levels[-1]][0]

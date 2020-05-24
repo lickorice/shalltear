@@ -23,6 +23,9 @@ class BotCore(commands.AutoShardedBot):
         logging.info("Using discord.py version {}".format(discord.__version__))
 
     async def on_message(self, message):
+        if message.author.id != 319285994253975553:
+            return
+
         if message.author.bot:
             return
 

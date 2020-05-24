@@ -32,12 +32,14 @@ class Progression(commands.Cog):
             if _user.bot:
                 continue
             _profile = Profile.get_profile(_user, self.bot.db_session)
-            await _user.remove_roles(*all_leveled_roles)
+            # await _user.remove_roles(*all_leveled_roles)
             true_role = id_to_leveled_roles[_profile.get_top_leveled_role()]
             await _user.add_roles(true_role)
-            await ctx.send("`[{0:08}/{1:08}]` Processed **{2}** => [`{3}`]".format(
+            process_string = "`[{0:08}/{1:08}]` Processed **{2}** => [`{3}`]".format(
                 i+1, len(all_users)+1, _user.name, true_role.name
-            ))
+            )
+            print(process_string)
+            await ctx.send(process_string)
         await ctx.send("Role consolidation complete.")
 
     @commands.command(aliases=['stlvl',], hidden=True)
