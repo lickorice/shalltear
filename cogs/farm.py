@@ -302,7 +302,7 @@ class Farm(commands.Cog):
                 ctx.author, _account.get_balance(), price / 10000
             ))
 
-    @commands.command(aliases=["rgpg"])
+    @commands.command(aliases=["rgpg"], hidden=True)
     @commands.is_owner()
     async def regenplantgraphs(self, ctx):
         """(Owner) Regenerate plant price graphs."""
@@ -312,7 +312,7 @@ class Farm(commands.Cog):
         
         await ctx.send("**Successfully regenerated all price graphs.**")
     
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def setplanttag(self, ctx, plant_name, tag):
         """(Owner) Set a plant's shorthand tag."""
@@ -325,7 +325,7 @@ class Farm(commands.Cog):
         self.bot.db_session.commit()
         await ctx.send("**Successfully changed plant tag.**")
     
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def setplantprice(self, ctx, plant_name, base_price: float):
         """(Owner) Set a plant's base unit price."""
@@ -335,7 +335,7 @@ class Farm(commands.Cog):
             return
         _plant.set_base_price(self.bot.db_session, base_price)
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def purgeplots(self, ctx, target: discord.Member=None):
         """(Owner) Purge the plants planted in a target's plots."""
@@ -357,7 +357,7 @@ class Farm(commands.Cog):
             del _farm.plots[i]
         await ctx.send(MSG_DISCARD_ALL.format(ctx.author))
     
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def reconsolidatestorage(self, ctx):
         """(Owner) Manually reconsolidate all farm capacities."""
@@ -372,7 +372,7 @@ class Farm(commands.Cog):
         logging.info("Reconsolidated storages of {} farms.".format(len(all_farms)))
         await ctx.send("**All farm storages reconsolidated!**")
     
-    @commands.command(aliases=["rpp"])
+    @commands.command(aliases=["rpp"], hidden=True)
     @commands.is_owner()
     async def refreshplantprices(self, ctx):
         """(Owner) Manually refresh the global market prices."""

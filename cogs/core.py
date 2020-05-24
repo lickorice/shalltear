@@ -16,6 +16,7 @@ class Core(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
 
+    @commands.cooldown(1, 60, type=commands.BucketType.user)
     @commands.command()
     async def ping(self, ctx):
         """Tests responsiveness."""

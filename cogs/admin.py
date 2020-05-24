@@ -12,7 +12,7 @@ class Admin(commands.Cog):
     def  __init__(self, bot):
         self.bot = bot
 
-    @commands.command(aliases=["bk",])
+    @commands.command(aliases=["bk",], hidden=True)
     @commands.is_owner()
     async def backup(self, ctx):
         """Manually backup the database"""
@@ -25,14 +25,14 @@ class Admin(commands.Cog):
             backup_file
         ))
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def kill(self, ctx):
         """(Owner) Shuts down the bot."""
         await ctx.send(MSG_SHUT_DOWN)
         await self.bot.logout()
 
-    @commands.command(aliases=['rlc',])
+    @commands.command(aliases=['rlc',], hidden=True)
     @commands.is_owner()
     async def reloadcogs(self, ctx, *cogs):
         """(Owner) Reload specified cogs. If no cog is specified, reloads all cogs."""

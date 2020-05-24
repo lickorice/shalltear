@@ -37,7 +37,7 @@ class Economy(commands.Cog):
 
         await ctx.send(embed=embed)
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def registerall(self, ctx):
         """(Owner) Gives all users in guild economy accounts."""
@@ -53,7 +53,7 @@ class Economy(commands.Cog):
         self.bot.db_session.commit()
         logging.info("Registered {0} new accounts in the Economy database.".format(registered))
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def admingiveall(self, ctx, amount: float):
         """(Owner) Grant everyone gil."""
@@ -65,7 +65,7 @@ class Economy(commands.Cog):
             _account.add_credit(self.bot.db_session, amount, "Admin grant.")
         await ctx.send("**Compensation finished.**")
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def purgeaccounts(self, ctx):
         """(Owner) Purge all accounts with transactions less than 5."""
@@ -77,7 +77,7 @@ class Economy(commands.Cog):
 
         await ctx.send("**Purging finished.**")
     
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def admingive(self, ctx, amount: float, target: discord.Member=None):
         """(Owner) Grant target gil."""
@@ -90,7 +90,7 @@ class Economy(commands.Cog):
         target_account.add_credit(self.bot.db_session, amount, "Admin grant.")
         await ctx.send(CMD_ADMIN_GIVE.format(target, amount))
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def admintake(self, ctx, amount: float, target: discord.Member=None):
         """(Owner) Deduct target's gil."""
@@ -103,7 +103,7 @@ class Economy(commands.Cog):
         target_account.add_debit(self.bot.db_session, amount, "Admin grant.")
         await ctx.send(CMD_ADMIN_TAKE.format(target, amount))
 
-    @commands.command()
+    @commands.command(hidden=True)
     @commands.is_owner()
     async def reconsolidateall(self, ctx, target: discord.Member=None):
         """(Owner) Reconsolidate the whole database's balances."""
