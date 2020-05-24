@@ -16,3 +16,6 @@ query.sql
 
 # Start scripts
 *.sh
+
+# Roles
+roles.py

@@ -1,0 +1,20 @@
+# Rename this to role.py so that the progression
+# cog can use it
+
+LEVELED_ROLES = {
+    70:(ROLE_ID_HERE, "Archduke"),
+    65:(ROLE_ID_HERE, "Grand Duke"),
+    60:(ROLE_ID_HERE, "Duke"),
+    55:(ROLE_ID_HERE, "Prince"),
+    50:(ROLE_ID_HERE, "Marquis"),
+    45:(ROLE_ID_HERE, "Count"),
+    40:(ROLE_ID_HERE, "Viscount"),
+    35:(ROLE_ID_HERE, "Baron"),
+    30:(ROLE_ID_HERE, "Lord"),
+    25:(ROLE_ID_HERE, "Imperial Knight"),
+    20:(ROLE_ID_HERE, "Knight"),
+    15:(ROLE_ID_HERE, "Squire"),
+    10:(ROLE_ID_HERE, "Footsoldier"),
+    5: (ROLE_ID_HERE, "Trainee"),
+    0: (ROLE_ID_HERE, "Peasant"),
+}

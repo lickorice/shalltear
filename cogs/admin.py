@@ -31,6 +31,15 @@ class Admin(commands.Cog):
         """(Owner) Shuts down the bot."""
         await ctx.send(MSG_SHUT_DOWN)
         await self.bot.logout()
+        
+    @commands.command(aliases=['rtt',], hidden=True)
+    @commands.is_owner()
+    async def rolestotext(self, ctx):
+        """(Owner) Sends a message containing all the roles the guild has."""
+        all_roles = ctx.guild.roles
+        for _role in all_roles[::-1]:
+            out_str = "`{0}` {1}\n".format(_role.id, _role.name)
+            await ctx.send(out_str)
 
     @commands.command(aliases=['rlc',], hidden=True)
     @commands.is_owner()
