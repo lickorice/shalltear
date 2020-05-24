@@ -49,7 +49,6 @@ class Farm(commands.Cog):
     async def farmtop(self, ctx):
         """Shows top farms in the server."""
         top_farms = ORMFarm.get_top_farms(self.bot.db_session)
-        print(top_farms)
 
         embed = discord.Embed(title="Top 10 Most Bountiful Farms", color=0xffd700)
         rank = 1

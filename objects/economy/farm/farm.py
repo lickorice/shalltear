@@ -59,8 +59,11 @@ class Farm(Base):
         return session.query(Farm).all()
 
     @staticmethod
-    def create_farm(user, session):
-        user_id = user.id
+    def create_farm(user, session, use_id=False):
+        if use_id:
+            user_id = user
+        else:
+            user_id = user.id
         new_farm = Farm(
             user_id = user_id,
         )
@@ -76,7 +79,7 @@ class Farm(Base):
             user_id = user.id
         result = session.query(Farm).filter_by(user_id=user_id).first()
         if result is None:
-            return Farm.create_farm(user, session)
+            return Farm.create_farm(user, session, use_id=use_id)
         return result
 
     def get_name(self, session):
