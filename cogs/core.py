@@ -42,7 +42,7 @@ class Core(commands.Cog):
         embed.add_field(name="Experience", value="**{0}** ({1} to next level)".format(
             _profile.experience, _profile.to_next - _profile.experience
         ), inline=False)
-        embed.add_field(name="Materia", value="**💎 {0}**".format(_profile.meme_stars))
+        embed.add_field(name="Materia", value="**💎 {0}**".format(_profile.materia))
         embed.add_field(name="Stars", value="**🌟 {0}**".format(_profile.meme_stars))
         embed.add_field(name="Farm Prestige", value="**{0}**".format(_profile.farm_prestige))
 
