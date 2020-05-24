@@ -2,7 +2,7 @@
 CURRENT_VERSION = "v0.0.2b"
 
 # Command prefix
-COMMAND_PREFIX = "==="
+COMMAND_PREFIX = "s!"
 
 # Location of secrets.json where the discord bot token is located.
 SECRETS_FILE = "secrets.json"

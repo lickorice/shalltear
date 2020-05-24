@@ -23,12 +23,12 @@ $ python3 run.py
 ```
 
 ## Changelog
-### `v0.1.0b` (Items and Auction Update)
+### `v0.1.0b` (Prestige and Levels Update)
 - **Add new levelling system based on chat activity.** Levels also correspond to leveled roles.
 - **Add new prestige currency 💎 Materia which can only be obtained after resetting.** Materia can be used to purchase roles, items, etc.
 - **Add new Farm Prestige system.** When max plots have been reached, you can do command `s!farmprestige` to fully reset your farm. When this happens, your **Farm Prestige level will increase**, and you will gain **💎 1 Materia** per **💵 100 million gil** you have on-hand.
 - **Add new Profile system.** `s!profile` will show your stats, including your 💎 Materia count, prestige levels, among others.
-- Farm top `s!farmtop` now displays the ranking by prestige level, then by plot count.
+- Farm top `s!farmtop` now displays the ranking **by farm prestige level**, then by plot count.
 - Add command `s!declarebankruptcy` which would reset your current farm instance and gil balance (in case of farm failure).
 - Plot system fully revamped and optimized.
 - Miscellaneous administration tools:
