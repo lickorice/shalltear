@@ -3,7 +3,7 @@
 # This is because randomizer functions are significantly slow
 # and should be used sparingly.
 
-from config import EXP_PER_MESSAGE
+from config import MESSAGE_EXP_FACTOR
 
 
 def message_to_xp(raw_message):
