@@ -25,7 +25,6 @@ ACTIVE_COGS = [
 
 ACTIVE_OBJECTS = [
     "objects.core.profile",
-    "objects.core.xpinc",
     "objects.economy.core.account",
     "objects.economy.core.transaction",
     "objects.economy.farm.farm",
