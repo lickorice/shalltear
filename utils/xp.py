@@ -9,4 +9,4 @@ from config import MESSAGE_EXP_FACTOR
 def message_to_xp(raw_message):
     words_in_message = raw_message.split()
     words_filtered = len([word for word in words_in_message if len(word) > 3])
-    return words_filtered ^ MESSAGE_EXP_FACTOR
+    return int(words_filtered ** MESSAGE_EXP_FACTOR)
