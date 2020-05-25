@@ -9,6 +9,7 @@ from sqlalchemy.orm import sessionmaker
 from config import COMMAND_PREFIX, EXP_PER_MESSAGE
 from objects.core.profile import Profile
 from roles import *
+from utils import xp as xputils
 
 
 class BotCore(commands.AutoShardedBot):
@@ -32,7 +33,8 @@ class BotCore(commands.AutoShardedBot):
         leveled_up = None
         _profile = Profile.get_profile(message.author, self.db_session)
         if not message.content.startswith(COMMAND_PREFIX):
-            leveled_up = _profile.process_xp(EXP_PER_MESSAGE, self.db_session)
+            message_exp = xputils.message_to_xp(message.content)
+            leveled_up = _profile.process_xp(message_exp, self.db_session)
 
         if leveled_up is not None:
             _msg = await message.channel.send("**{0.mention}, you have leveled up!** You are now **Level {1}**." .format(

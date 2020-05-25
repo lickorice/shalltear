@@ -25,6 +25,7 @@ ACTIVE_COGS = [
 
 ACTIVE_OBJECTS = [
     "objects.core.profile",
+    "objects.core.xpinc",
     "objects.economy.core.account",
     "objects.economy.core.transaction",
     "objects.economy.farm.farm",
@@ -41,6 +42,7 @@ ACTIVE_SEEDERS = [
 BASE_EXPERIENCE = 100
 EXP_FACTOR = 1.2
 EXP_PER_MESSAGE = 1
+MESSAGE_EXP_FACTOR = 1.1
 LEVEL_UP_MATERIA_REWARD = 1
 
 # Economy
