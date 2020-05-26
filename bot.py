@@ -24,6 +24,8 @@ class BotCore(commands.AutoShardedBot):
         logging.info("Using discord.py version {}".format(discord.__version__))
 
     async def on_message(self, message):
+        if message.guild is None:
+            return
         if message.author.bot:
             return
 
